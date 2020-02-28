@@ -61,7 +61,7 @@ public class MyFilteredLearner {
             filter.setAttributeIndices("last");
             classifier = new FilteredClassifier();
             classifier.setFilter(filter);
-            classifier.setClassifier(new SimpleLinearRegression());
+            classifier.setClassifier(new NaiveBayes());
             Evaluation eval = new Evaluation(trainData);
             eval.crossValidateModel(classifier, trainData, 4, new Random(1));
             System.out.println(eval.toSummaryString());
