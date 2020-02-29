@@ -157,7 +157,21 @@ public class MainClass {
     
         System.out.println("********");
     
-        getRidOfDot(sentence);
+//        getRidOfDot(sentence);
+        
+        
+        /* whether insert a space or not
+        StringBuilder stringBuilder = new StringBuilder();
+        
+        stringBuilder.append("abc");
+        stringBuilder.append("def");
+        
+        String newString = stringBuilder.toString();
+        System.out.println(newString);
+        */
+        
+        
+        
         
         /*
         List<SingleAnalysis> singleAnalysisList = morphology.analyzeAndDisambiguate(sentence).bestAnalysis();
@@ -216,6 +230,12 @@ public class MainClass {
     
 
 
+    }
+    
+    public static String tagSentence(String sentence){
+        String taggedSentence = "";
+        
+        return taggedSentence;
     }
     
     // get rid of dots in words like a.q
