@@ -3,6 +3,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -19,7 +21,13 @@ import weka.filters.unsupervised.attribute.StringToWordVector;
 import weka.classifiers.Classifier;
 import zemberek.core.logging.Log;
 import zemberek.morphology.TurkishMorphology;
+import zemberek.morphology.analysis.SingleAnalysis;
+import zemberek.morphology.analysis.WordAnalysis;
+import zemberek.morphology.lexicon.RootLexicon;
 import zemberek.ner.*;
+import zemberek.normalization.TurkishSentenceNormalizer;
+import zemberek.tokenization.Token;
+import zemberek.tokenization.TurkishTokenizer;
 
 public class MainClass {
 
@@ -111,62 +119,178 @@ public class MainClass {
 //    }
     public static void main(String[] args) throws Exception {
 
-        String trainingFileName = new String("/Users/test/IdeaProjects/message analysis/data/real_train_set.arff");
-        String testFileName = new String("/Users/test/IdeaProjects/message analysis/data/real_test_set.arff");
-        String txtTestFileName = new String("/Users/test/IdeaProjects/message analysis/data/real_test_set.txt");
-        String txtTestFileName2 = new String("/Users/test/IdeaProjects/message analysis/data/real_test_set_2.txt");
-        String modelFile = new String("/Users/test/IdeaProjects/message analysis/data/real_model.dat");
+        String trainingFileName = new String("data/real_train_set.arff");
+        String testFileName = new String("data/real_test_set.arff");
+        String txtTestFileName = new String("data/real_test_set.txt");
+        String txtTestFileName2 = new String("data/real_test_set_2.txt");
+        String modelFile = new String("data/real_model.dat");
 
 //        withNaive(trainingFileName,testFileName);
 
 //        readFileResults();
 
-        learnByFiltered(trainingFileName,modelFile);
+//        learnByFiltered(trainingFileName,modelFile);
 //
-        clasifyByFiltered(txtTestFileName2,modelFile);
+//        clasifyByFiltered(txtTestFileName2,modelFile);
 
 //        trial();
 
 
+        Path lookupRoot = Paths.get("data/normalization");
+        Path lmFile = Paths.get("data/lm/lm.2gram.slm");
+        
+//        TurkishMorphology morphology = TurkishMorphology.createWithDefaults();
+        TurkishMorphology morphology = TurkishMorphology.builder().setLexicon(RootLexicon.getDefault()).useInformalAnalysis().build();
+        TurkishSentenceNormalizer normalizer = new TurkishSentenceNormalizer(morphology, lookupRoot, lmFile);
 
-////        BufferedReader datafile = readDataFile("/Users/test/IdeaProjects/message analysis/data/real_train_set.arff");
-//        BufferedReader inputReader = null;
-//
-//        try {
-//            inputReader = new BufferedReader(new FileReader("/Users/test/IdeaProjects/message analysis/data/real_train_set.arff"));
-//        } catch (FileNotFoundException ex) {
-//            System.err.println("File not found: " + "/Users/test/IdeaProjects/message analysis/data/real_train_set.arff");
-//        }
-//        Instances data = new Instances(inputReader);
-//        data.setClassIndex(0);
-//
-////        StringToWordVector filter = null;
-////        weka.filters.unsupervised.attribute.RemoveType filter = new weka.filters.unsupervised.attribute.RemoveType();
-//        weka.filters.unsupervised.attribute.StringToNominal filter = new weka.filters.unsupervised.attribute.StringToNominal();
-//
-////        filter.setAttributeIndices("last");
-//
-//
-//        FilteredClassifier classifier = new FilteredClassifier();
-//        classifier.setFilter(filter);
-//        classifier.setClassifier(new NaiveBayesMultinomial());
-//
-//        Evaluation eval = new Evaluation(data);
-//        eval.crossValidateModel(classifier, data, 4, new Random(1));
-//        System.out.println(eval.toSummaryString());
+        String sentence = "Siktir gir a.q. göt ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
+//        String sentence = "Salaklı a.q konuşma insan ol biraz terbiyeni takıl";
+        String normalizedSentence = normalizer.normalize(sentence);
+        System.out.println(normalizedSentence);
+
+        System.out.println("--");
+
+        String[] arr = normalizedSentence.split(" ");
+
+        for ( String ss : arr)
+            System.out.println(ss);
+    
+        System.out.println("********");
+    
+        getRidOfDot(sentence);
+        
+        /*
+        List<SingleAnalysis> singleAnalysisList = morphology.analyzeAndDisambiguate(sentence).bestAnalysis();
+        for(int i = 0; i < singleAnalysisList.size(); ++i){
+            System.out.println(singleAnalysisList.get(i));
+        }
+        */
+        
+        /*
+        for (int i = 0; i < tokens.size(); ++i) {
+            WordAnalysis result = morphology.analyze(tokens.get(i));
+            Iterator<SingleAnalysis> iter = result.iterator();
+            while( iter.hasNext() ){
+                SingleAnalysis nextAnalysis = iter.next();
+                System.out.println(nextAnalysis.formatLong());
+//                System.out.println("\tStems = " + analysis.getStems());
+                System.out.println("\tLemmas = " + nextAnalysis.getLemmas());
+            }
+            
+        }
+        */
+    
+        System.out.println("000000000000");
+    
+        
+        
+        
+        /*
+        String fileRd = "data/badWords.txt";
+        String fileWr = "data/normalizedBads.txt";
+        
+        List<String> sentences = fileRead(fileRd);
+        List<String> normalizedSentences = new ArrayList<>();
+        
+        for(int i = 0; i < sentences.size(); ++i)
+        {
+            normalizedSentences.add(normalizer.normalize(sentences.get(i))+"\n");
+        }
+        
+        fileWrite(fileWr,normalizedSentences);
+        */
+        
+        //  morphology
+        TurkishMorphology analyzer = TurkishMorphology.builder().setLexicon(RootLexicon.getDefault()).disableCache().build();
+        
+        
+        
+        
+        
+        //
+        
 
 
 
 
+    
 
+
+    }
+    
+    // get rid of dots in words like a.q
+    public static String getRidOfDot(String sentence){
+        String newSentence = "";
+        List<String> listString = new ArrayList<>();
+        
+        //        TurkishTokenizer tokenizer = TurkishTokenizer.DEFAULT;
+        TurkishTokenizer tokenizer = TurkishTokenizer.builder().ignoreTypes(Token.Type.NewLine, Token.Type.SpaceTab).build();
+        List<String> tokens = tokenizer.tokenizeToStrings(sentence);
+    
+        for(int i = 0; i < tokens.size(); ++i){
+            System.out.println("token :"+tokens.get(i));
+        }
+    
+        System.out.println("size :"+tokens.size());
+        
+        return newSentence;
+    }
+    
+    public static void fileWrite(String fileName, List<String> sentences){
+    
+        // attach a file to FileWriter
+        FileWriter fw = null;
+        try {
+            fw = new FileWriter(fileName);
+            // read character wise from string and write
+            // into FileWriter
+            for (int i = 0; i < sentences.size(); i++)
+                fw.write(sentences.get(i));
+            
+            fw.close();
+            //close the file
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        System.out.println("Writing successful");
+        
+    }
+    
+    public static List<String> fileRead(String fileName){
+        
+        List<String> sentences = new ArrayList<>();
+    
+        try
+        {
+            File file = new File(fileName);    //creates a new file instance
+            FileReader fr = new FileReader(file);   //reads the file
+            BufferedReader br = new BufferedReader(fr);  //creates a buffering character input stream
+            StringBuffer sb = new StringBuffer();    //constructs a string buffer with no characters
+            String line;
+            while((line = br.readLine()) != null)
+            {
+                sentences.add(line+"\n");
+            }
+            fr.close();    //closes the stream and release the resources
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+    
+        System.out.println("reading is done.");
+    
+        return sentences;
     }
 
     public static void generateNerModel() throws IOException {
         // you will need ner-train and ner-test files to run this example.
 
-        Path trainPath = Paths.get("/Users/test/IdeaProjects/message analysis/data/ner-train");
-        Path testPath = Paths.get("/Users/test/IdeaProjects/message analysis/data/ner-test");
-        Path modelRoot = Paths.get("/Users/test/IdeaProjects/message analysis/data/my-model");
+        Path trainPath = Paths.get("data/ner-train");
+        Path testPath = Paths.get("data/ner-test");
+        Path modelRoot = Paths.get("data/my-model");
 
         NerDataSet trainingSet = NerDataSet.load(trainPath, NerDataSet.AnnotationStyle.BRACKET);
         Log.info(trainingSet.info()); // prints information
@@ -231,7 +355,7 @@ public class MainClass {
 
 
             //      -------
-            File file = new File("/Users/test/IdeaProjects/message analysis/data/results.txt");
+            File file = new File("data/results.txt");
             FileWriter fr = null;
             try {
                 fr = new FileWriter(file);
@@ -269,7 +393,7 @@ public class MainClass {
 
     public static void readFileResults(){
         try {
-            File myObj = new File("/Users/test/IdeaProjects/message analysis/data/results.txt");
+            File myObj = new File("data/results.txt");
             Scanner myReader = new Scanner(myObj);
             int i = 1, truePositive = 0, trueNegative = 0, falsePositive = 0, falseNegative = 0;
             double precision = 0.0;
@@ -382,9 +506,9 @@ public class MainClass {
         BufferedReader inputReader = null;
 
         try {
-            inputReader = new BufferedReader(new FileReader("/Users/test/IdeaProjects/message analysis/data/real_train_set.arff"));
+            inputReader = new BufferedReader(new FileReader("data/real_train_set.arff"));
         } catch (FileNotFoundException ex) {
-            System.err.println("File not found: " + "/Users/test/IdeaProjects/message analysis/data/real_train_set.arff");
+            System.err.println("File not found: " + "data/real_train_set.arff");
         }
         Instances dataRaw = new Instances(inputReader);
         dataRaw.setClassIndex(dataRaw.numAttributes() - 1);
@@ -403,6 +527,34 @@ public class MainClass {
         J48 classifier = new J48();
         classifier.buildClassifier(dataFiltered);
         System.out.println("\n\nClassifier model:\n\n" + classifier);
+
+
+////        BufferedReader datafile = readDataFile("/Users/test/IdeaProjects/message analysis/data/real_train_set.arff");
+//        BufferedReader inputReader = null;
+//
+//        try {
+//            inputReader = new BufferedReader(new FileReader("/Users/test/IdeaProjects/message analysis/data/real_train_set.arff"));
+//        } catch (FileNotFoundException ex) {
+//            System.err.println("File not found: " + "/Users/test/IdeaProjects/message analysis/data/real_train_set.arff");
+//        }
+//        Instances data = new Instances(inputReader);
+//        data.setClassIndex(0);
+//
+////        StringToWordVector filter = null;
+////        weka.filters.unsupervised.attribute.RemoveType filter = new weka.filters.unsupervised.attribute.RemoveType();
+//        weka.filters.unsupervised.attribute.StringToNominal filter = new weka.filters.unsupervised.attribute.StringToNominal();
+//
+////        filter.setAttributeIndices("last");
+//
+//
+//        FilteredClassifier classifier = new FilteredClassifier();
+//        classifier.setFilter(filter);
+//        classifier.setClassifier(new NaiveBayesMultinomial());
+//
+//        Evaluation eval = new Evaluation(data);
+//        eval.crossValidateModel(classifier, data, 4, new Random(1));
+//        System.out.println(eval.toSummaryString());
+    
 
 
     }
