@@ -1,6 +1,5 @@
 abaza
 abazan
-ağzına sıçayım
 ahmak
 allahsız
 am
@@ -22,28 +21,20 @@ amcuk
 amık
 amın
 amına
-amına koy
-amına koyarım
-amına koyayım
 amınakoyim
-amına sikem
-amına sokam
 amını
 amınoğlu
 amısına
 amısını
 amina
 aminakoyarim
-amina koyarim
-amina koyayım
-amina koyayim
 aminakoyim
 aminda
 amindan
 amindayken
 amini
 aminoglu
-amin oglu
+amin
 amk
 amkafa
 amk çocuğu
@@ -68,8 +59,6 @@ anandan
 ananı
 ananı
 ananın
-ananın am
-ananın amı
 ananınki
 ananısıkerım
 ananı sıkerım
@@ -78,22 +67,14 @@ ananı sikerim
 ananısikeyim
 ananı sikeyim
 ananızın
-ananızın am
-ananızın amı
-ananizin ami
+ananizin
 anani
 ananin
 ananisikerim
-anani sikerim
 ananisikeyim
-anani sikeyim
 anann
 anasını
-anasının am
-anasının amı
-anasinin am
-anasinin ami
-anası orospu
+anasının
 anasinin
 angut
 anneni
@@ -111,9 +92,6 @@ atkafasi
 atmık
 attırdığım
 attrrm
-babaannesi kaşar
-babası pezevenk
-bacağına sıçayım
 bacına
 bacina
 bacını
@@ -125,14 +103,12 @@ beyinsiz
 bitch
 bok
 boka
-bok bok
 bokça
 bokkkumu
 bokdan
 boktan
 boku
 bokubokuna
-boku bokuna
 bokum
 bombok
 bom bok
@@ -207,9 +183,6 @@ godumun
 got
 gotelek
 gotlalesi
-got lalesi
-got oglani
-got oğlanı
 gotlu
 gotten
 gotundeki
@@ -217,46 +190,28 @@ gotunden
 gotune
 gotunu
 gotünekoyim
-gotüne koyim
-gotüne sok
-gotüne sokarım
-gotüne sokarim
+gotüne
 gotunekoyim
-gotune koyim
-gotune sok
-gotune sokarım
-gotune sokarim
 gotveren
 goyiim
 goyum
 goyuyim
 goyyim
 göt
-göt deliği
 götelek
-göt herif
 götlalesi
-göt lalesi
 götlek
 götoğlanı
 götoglanı
 götoglani
-göt oglani
-göt oğlanı
 götoş
 götten
 götü
 götün
 götüne
 götünekoyim
-götüne koyim
-götüne sok
-götüne sokarım
-götüne sokarim
 götünü
 götveren
-göt veren
-göt verir
 gtnde
 gtnden
 gtne
@@ -264,7 +219,6 @@ gtten
 gtveren
 hasiktir
 hassiktir
-has siktir
 hassittir
 haysiyetsiz
 hayvan
@@ -284,8 +238,9 @@ ibnesi
 idiot
 idiyot
 imansz
+it
 ipne
-itoğlu it
+itoğlu
 kafasız
 kafasiz
 kahpe
@@ -302,7 +257,6 @@ kaypak
 kevase
 kevaşe
 kevvase
-koca göt
 koduğmun
 koduğmunun
 kodumun
@@ -324,44 +278,31 @@ motherfucker
 oc
 OÇ
 oç
-o . cocugu
-o . cocuğu
-o. cocuğu
-o. cocugu
-o. çocuğu
-o . çocuğu
-o . çocugu
+o .
+o . ç
+o.
+o.ç
 oğlancı
-oğlu it
 orosbucocuu
 orospu
-orospucocugu
-orospu cocugu
-orospu çoc
-orospuçocuğu
-orospu çocuğu
-orospu çocuğudur
-orospu çocukları
 orospunun
 orrospu
 oruspu
 oruspuçocuğu
-oruspu çocuğu
 öküz
 penis
 pezevek
 pezeven
 pezeveng
 pezevengi
-pezevengin evladı
+pezevengin
 pezevenk
 pezo
 pic
 pici
 picler
 piç
-piçin oğlu
-piç kurusu
+piçin
 piçler
 pipi
 pipiş
@@ -383,7 +324,9 @@ sıcarm
 sıç
 sıçarım
 sıçarm
+sıçayım
 sıçtığım
+sıkerım
 siç
 sicarsin
 sie
@@ -482,15 +425,11 @@ siktim
 siktimin
 siktiminin
 siktir
-siktir et
 siktirgit
-siktir git
 siktirir
 siktiririm
 siktiriyor
-siktir lan
 siktirolgit
-siktir ol git
 skcem
 skecem
 skem
@@ -528,6 +467,8 @@ sulaleni
 sülaleni
 sülalenizi
 sürtük
+s.keyim
+s.kiyim
 şerefsiz
 şıllık
 tasag
@@ -538,16 +479,13 @@ tasag
 taşak
 taşşag
 taşşak
-tipini s.k
-tipinizi s.keyim
-tipinizi s.kiyim
 topsun
 totoş
 vajina
 vajinanı
 veled
 veledizina
-veled i zina
+zina
 weled
 weledizina
 whore
