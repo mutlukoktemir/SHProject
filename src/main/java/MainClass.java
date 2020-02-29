@@ -330,7 +330,7 @@ public class MainClass {
 
     public static void useNer() throws IOException {
         // assumes you generated a model in my-model directory.
-        Path modelRoot = Paths.get("/Users/test/IdeaProjects/message analysis/data/my-model");
+        Path modelRoot = Paths.get("data/my-model");
 
         TurkishMorphology morphology = TurkishMorphology.createWithDefaults();
 
