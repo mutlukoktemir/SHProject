@@ -87,6 +87,9 @@ a . q
 a.q.
 a . q .
 aq.
+atağızlı
+at ağızlı
+ayı
 atkafası
 atkafasi
 atmık
@@ -178,6 +181,8 @@ gerızekalı
 gerizekalı
 gerizekali
 gerzek
+gevsek
+gevşek
 godoş
 godumun
 got
@@ -468,6 +473,8 @@ sulaleni
 sülaleni
 sülalenizi
 sürtük
+sktir
+s.git
 s.keyim
 s.kiyim
 şerefsiz
@@ -480,6 +487,7 @@ tasag
 taşak
 taşşag
 taşşak
+top
 topsun
 totoş
 vajina

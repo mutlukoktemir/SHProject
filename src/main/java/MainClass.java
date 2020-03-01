@@ -193,6 +193,39 @@ public class MainClass {
             
         }
         */
+        
+        /*
+        // trial
+        String fileBads = "data/badWords.txt";    //creates a new file instance
+        FileWriter fw = new FileWriter("data/out.txt");
+    
+        for (int i = 0; i < 10; i++) {
+            fw.write("something");
+            fw.write("\n");
+        }
+    
+        fw.close();
+    
+        try
+        {
+            File file = new File("data/out.txt");    //creates a new file instance
+            FileReader fr = new FileReader(file);   //reads the file
+            BufferedReader br = new BufferedReader(fr);  //creates a buffering character input stream
+        
+            String line;
+            while((line = br.readLine()) != null)
+            {
+                System.out.println("size of string: "+line.length());
+            }
+            fr.close();    //closes the stream and release the resources
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+        
+        // end of trial
+        */
     
         System.out.println("000000000000");
     
@@ -227,13 +260,40 @@ public class MainClass {
 
 
 
-    
+        tagSentence("sfa");
 
 
     }
     
     public static String tagSentence(String sentence){
         String taggedSentence = "";
+    
+        List<String> badsList = new ArrayList<>();
+        List<String> badWordsList = new ArrayList<>();
+    
+        String fileBads = "data/bads.txt";    //creates a new file instance
+        badsList = fileRead(fileBads);
+    
+        String fileBadSentences = "data/badWords.txt";    //creates a new file instance
+        List<String> badSentenceList = fileRead(fileBadSentences);
+        List<String> lowerBadSentenceList = new ArrayList<>();
+        
+        for(int i = 0; i < badSentenceList.size(); ++i){
+            lowerBadSentenceList.add(badSentenceList.get(i).toLowerCase());
+        }
+        
+        String fileBadSentencesLow = "data/lowerCaseBadSentences.txt";
+        fileWrite(fileBadSentencesLow,lowerBadSentenceList);
+        
+        
+        
+        String fileBadWords = "data/blackListTurkish.txt";    //creates a new file instance
+        badWordsList = fileRead(fileBadWords);
+        
+        
+        
+        
+        
         
         return taggedSentence;
     }
@@ -264,8 +324,11 @@ public class MainClass {
             fw = new FileWriter(fileName);
             // read character wise from string and write
             // into FileWriter
-            for (int i = 0; i < sentences.size(); i++)
+            for (int i = 0; i < sentences.size(); i++){
                 fw.write(sentences.get(i));
+                fw.write("\n");
+            }
+            
             
             fw.close();
             //close the file
@@ -287,11 +350,11 @@ public class MainClass {
             File file = new File(fileName);    //creates a new file instance
             FileReader fr = new FileReader(file);   //reads the file
             BufferedReader br = new BufferedReader(fr);  //creates a buffering character input stream
-            StringBuffer sb = new StringBuffer();    //constructs a string buffer with no characters
+            
             String line;
             while((line = br.readLine()) != null)
             {
-                sentences.add(line+"\n");
+                sentences.add(line);
             }
             fr.close();    //closes the stream and release the resources
         }
