@@ -274,21 +274,49 @@ public class MainClass {
         String fileBads = "data/bads.txt";    //creates a new file instance
         badsList = fileRead(fileBads);
     
-        String fileBadSentences = "data/badWords.txt";    //creates a new file instance
+        String fileBadSentences = "data/bads500.txt";    //creates a new file instance
         List<String> badSentenceList = fileRead(fileBadSentences);
         List<String> lowerBadSentenceList = new ArrayList<>();
         
         for(int i = 0; i < badSentenceList.size(); ++i){
-            lowerBadSentenceList.add(badSentenceList.get(i).toLowerCase());
+            String lowerString = badSentenceList.get(i).toLowerCase();
+            String[] stringArray = lowerString.split("\\s");//splits the string based on whitespace
+
+            StringBuilder newSentence = new StringBuilder();
+
+            for(int j = 0; j < stringArray.length; ++j){
+                String badStr = stringArray[j];
+                String strAdd = new String();
+                for(int k = 0; k < badsList.size(); ++k){
+                    int checkStringIndex  = badStr.indexOf(badsList.get(k));
+                    if( checkStringIndex != -1 ){
+                        strAdd = "[BAD "+stringArray[j]+"] ";
+                        break;
+                    }
+                    else
+                        strAdd = stringArray[j]+" ";
+                }
+
+                newSentence.append(strAdd);
+
+            }
+
+            System.out.println(newSentence);
+
+
+
+
         }
-        
-        String fileBadSentencesLow = "data/lowerCaseBadSentences.txt";
-        fileWrite(fileBadSentencesLow,lowerBadSentenceList);
-        
-        
-        
-        String fileBadWords = "data/blackListTurkish.txt";    //creates a new file instance
-        badWordsList = fileRead(fileBadWords);
+
+
+//
+//        String fileBadSentencesLow = "data/lowerCaseBadSentences.txt";
+//        fileWrite(fileBadSentencesLow,lowerBadSentenceList);
+//
+//
+//
+//        String fileBadWords = "data/blackListTurkish.txt";    //creates a new file instance
+//        badWordsList = fileRead(fileBadWords);
         
         
         
