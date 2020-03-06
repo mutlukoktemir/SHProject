@@ -1,3 +1,4 @@
+arabamcom
 arabam.com
 arabam.co
 arabam.c
@@ -17,7 +18,7 @@ trend yol
 vatanbilgisayar
 vatan bilgisayar
 istanbul bilişim
-www.
+www
 https:
 n11
 gittigidiyor
@@ -37,3 +38,6 @@ hürriyetemlak
 milliyet emlak
 milliyetemlak
 teknosa
+Nanokatolog
+akakce
+YouTube
