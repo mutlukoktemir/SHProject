@@ -18,6 +18,7 @@ trend yol
 vatanbilgisayar
 vatan bilgisayar
 istanbul bilişim
+istanbul bilisim
 www
 https:
 n11

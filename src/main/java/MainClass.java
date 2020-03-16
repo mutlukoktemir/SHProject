@@ -144,32 +144,24 @@ public class MainClass {
         TurkishSentenceNormalizer normalizer = new TurkishSentenceNormalizer(morphology, lookupRoot, lmFile);
 
         String sentence = "Siktir gir a.q. göt ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
-//        String sentence = "Salaklı a.q konuşma insan ol biraz terbiyeni takıl";
-        String normalizedSentence = normalizer.normalize(sentence);
-        System.out.println(normalizedSentence);
-
-        System.out.println("--");
-
-        String[] arr = normalizedSentence.split(" ");
-
-        for ( String ss : arr)
-            System.out.println(ss);
+        
+        String sentence2 = "merhabalar. takasa acik demissiniz. bazi studyo ekipmanlari var letgo'da. dusunur musunuz?";
+        String sentence3 = "sahibinden üzerinden havale yolu ile satıyoruz. Dilerseniz n11 mağazamızdan da site üzerinden alışveriş yapabilirsiniz. https://urun.n11.com/jant-kapagi/16-inc-jant-kapagi-kirilmaz-takim-celik-gorunumlu-P369878247";
+        String sentence4 = "Sahibinden uygulamam da biraz sorun var.Fiyatı Letgoda 650ye düşürdüm";
+        
+        String sentence5 = "fiyati belirlemek sizin takdiriniz elbette, ama arabam.com yaklasik fiyat tahmin uygulamasinda bu arac 53800-56000 araliginda cikiyor. lpg oldugunundan ona gore bir deger artisi da olacaktir.";
+        
+        String sentence6 = "mrb.Arabam.com daki 12024423 nolu aracıma bak.üste nakit verebilirim.anlaşırsak hemen getir misafirim ol.Arabayı al git.geç olduğu için arayamadım.";
+        
+//      first step -> lower case
+        String lowerSentence = sentence4.toLowerCase();
+        
+//      tag the sentence
+        String taggedSentence = tagSentence(lowerSentence);
     
+        System.out.println(taggedSentence);
+        
         System.out.println("********");
-    
-//        getRidOfDot(sentence);
-        
-        
-        /* whether insert a space or not
-        StringBuilder stringBuilder = new StringBuilder();
-        
-        stringBuilder.append("abc");
-        stringBuilder.append("def");
-        
-        String newString = stringBuilder.toString();
-        System.out.println(newString);
-        */
-        
         
         
         
@@ -194,119 +186,79 @@ public class MainClass {
         }
         */
         
-        /*
-        // trial
-        String fileBads = "data/badWords.txt";    //creates a new file instance
-        FileWriter fw = new FileWriter("data/out.txt");
-    
-        for (int i = 0; i < 10; i++) {
-            fw.write("something");
-            fw.write("\n");
-        }
-    
-        fw.close();
-    
-        try
-        {
-            File file = new File("data/out.txt");    //creates a new file instance
-            FileReader fr = new FileReader(file);   //reads the file
-            BufferedReader br = new BufferedReader(fr);  //creates a buffering character input stream
-        
-            String line;
-            while((line = br.readLine()) != null)
-            {
-                System.out.println("size of string: "+line.length());
-            }
-            fr.close();    //closes the stream and release the resources
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
-        
-        // end of trial
-        */
     
         System.out.println("000000000000");
     
-        
-        
-        
-        /*
-        String fileRd = "data/badWords.txt";
-        String fileWr = "data/normalizedBads.txt";
-        
-        List<String> sentences = fileRead(fileRd);
-        List<String> normalizedSentences = new ArrayList<>();
-        
-        for(int i = 0; i < sentences.size(); ++i)
-        {
-            normalizedSentences.add(normalizer.normalize(sentences.get(i))+"\n");
-        }
-        
-        fileWrite(fileWr,normalizedSentences);
-        */
+       
         
         //  morphology
         TurkishMorphology analyzer = TurkishMorphology.builder().setLexicon(RootLexicon.getDefault()).disableCache().build();
         
         
-        
-        
-        
-        //
-        
-
-
-
-
-        tagSentence("sfa");
 
 
     }
     
+    public static String splitByPunc(String sentence){
+    
+        List<String> tokensOfSentence = tokenizeSentence(sentence);
+    
+        StringBuilder stringBuilder = new StringBuilder();
+        for(String token:tokensOfSentence) {
+//            System.out.println("token: " + token);
+            stringBuilder.append(token);
+            stringBuilder.append(" ");
+        }
+        String sent = stringBuilder.toString().trim();
+//        System.out.println("punc: "+sent);
+        
+        return sent;
+    }
+    
     public static String tagSentence(String sentence){
         String taggedSentence = "";
-    
-        List<String> badsList = new ArrayList<>();
-        List<String> badWordsList = new ArrayList<>();
+        
+        List<String> tokensOfSentence = tokenizeSentence(sentence);
     
         String fileBads = "data/bads.txt";    //creates a new file instance
-        badsList = fileRead(fileBads);
-    
-        String fileBadSentences = "data/bads500.txt";    //creates a new file instance
-        List<String> badSentenceList = fileRead(fileBadSentences);
-        List<String> lowerBadSentenceList = new ArrayList<>();
+        List<String> badsList = readSentencesFromFile(fileBads);
         
-        for(int i = 0; i < badSentenceList.size(); ++i){
-            String lowerString = badSentenceList.get(i).toLowerCase();
-            String[] stringArray = lowerString.split("\\s");//splits the string based on whitespace
+        String fileBWords = "data/blackListTurkish.txt";
+        List<String> badWordsList = readSentencesFromFile(fileBWords);
+        
+        
+        
+        
+        
+//        for(int i = 0; i < badSentenceList.size(); ++i){
+//            String lowerString = badSentenceList.get(i).toLowerCase();
+//            String[] stringArray = lowerString.split("\\s");//splits the string based on whitespace
+//
+//            StringBuilder newSentence = new StringBuilder();
+//
+//            for(int j = 0; j < stringArray.length; ++j){
+//                String badStr = stringArray[j];
+//                String strAdd = new String();
+//                for(int k = 0; k < badsList.size(); ++k){
+//                    int checkStringIndex  = badStr.indexOf(badsList.get(k));
+//                    if( checkStringIndex != -1 ){
+//                        strAdd = "[BAD "+stringArray[j]+"] ";
+//                        break;
+//                    }
+//                    else
+//                        strAdd = stringArray[j]+" ";
+//                }
+//
+//                newSentence.append(strAdd);
+//
+//            }
+//
+//            System.out.println(newSentence);
+//
+//        }
 
-            StringBuilder newSentence = new StringBuilder();
-
-            for(int j = 0; j < stringArray.length; ++j){
-                String badStr = stringArray[j];
-                String strAdd = new String();
-                for(int k = 0; k < badsList.size(); ++k){
-                    int checkStringIndex  = badStr.indexOf(badsList.get(k));
-                    if( checkStringIndex != -1 ){
-                        strAdd = "[BAD "+stringArray[j]+"] ";
-                        break;
-                    }
-                    else
-                        strAdd = stringArray[j]+" ";
-                }
-
-                newSentence.append(strAdd);
-
-            }
-
-            System.out.println(newSentence);
 
 
-
-
-        }
 
 
 //
@@ -316,7 +268,7 @@ public class MainClass {
 //
 //
 //        String fileBadWords = "data/blackListTurkish.txt";    //creates a new file instance
-//        badWordsList = fileRead(fileBadWords);
+//        badWordsList = readSentencesFromFile(fileBadWords);
         
         
         
@@ -326,22 +278,21 @@ public class MainClass {
         return taggedSentence;
     }
     
-    // get rid of dots in words like a.q
-    public static String getRidOfDot(String sentence){
-        String newSentence = "";
-        List<String> listString = new ArrayList<>();
+    
+    public static List<String> tokenizeSentence(String sentence){
         
         //        TurkishTokenizer tokenizer = TurkishTokenizer.DEFAULT;
         TurkishTokenizer tokenizer = TurkishTokenizer.builder().ignoreTypes(Token.Type.NewLine, Token.Type.SpaceTab).build();
         List<String> tokens = tokenizer.tokenizeToStrings(sentence);
     
-        for(int i = 0; i < tokens.size(); ++i){
-            System.out.println("token :"+tokens.get(i));
-        }
-    
-        System.out.println("size :"+tokens.size());
+//
+//        for(int i = 0; i < tokens.size(); ++i){
+//            System.out.println("token :"+tokens.get(i));
+//        }
+//
+//        System.out.println("size :"+tokens.size());
         
-        return newSentence;
+        return tokens;
     }
     
     public static void fileWrite(String fileName, List<String> sentences){
@@ -369,7 +320,7 @@ public class MainClass {
         
     }
     
-    public static List<String> fileRead(String fileName){
+    public static List<String> readSentencesFromFile(String fileName){
         
         List<String> sentences = new ArrayList<>();
     
@@ -391,7 +342,7 @@ public class MainClass {
             e.printStackTrace();
         }
     
-        System.out.println("reading is done.");
+//        System.out.println("reading is done.");
     
         return sentences;
     }
