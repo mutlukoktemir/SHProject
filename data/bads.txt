@@ -1,12 +1,16 @@
+www
+https:
 arabamcom
-arabam.com
 arabam.co
-arabam.c
 arabam com
-araba.com
-araba com
+arabam c o m
 araba.c
+araba.co
+araba com
+amazon.c
+amazon
 letgo
+letko
 let go
 sanalpazar
 sanal pazar
@@ -17,21 +21,16 @@ trendyol
 trend yol
 vatanbilgisayar
 vatan bilgisayar
+istanbulbilisim
 istanbul bilişim
 istanbul bilisim
-www
-https:
 n11
 gittigidiyor
 gitti gidiyor
 aliexpress
 ali express
 morhipo
-letko
 ikea
-amazon
-amazon.
-amazon.c
 hurriyetemlak
 hurriyet emlak
 hürriyet emlak
@@ -39,6 +38,6 @@ hürriyetemlak
 milliyet emlak
 milliyetemlak
 teknosa
-Nanokatolog
+nanokatolog
 akakce
-YouTube
+youtube

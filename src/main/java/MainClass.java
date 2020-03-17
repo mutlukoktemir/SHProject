@@ -153,15 +153,23 @@ public class MainClass {
         
         String sentence6 = "mrb.Arabam.com daki 12024423 nolu aracıma bak.üste nakit verebilirim.anlaşırsak hemen getir misafirim ol.Arabayı al git.geç olduğu için arayamadım.";
         
+        String sentence7 = "arabam comda";
+        
 //      first step -> lower case
-        String lowerSentence = sentence4.toLowerCase();
+        String lowerSentence = sentence7.toLowerCase();
+        
+//        String normedSentence = normalizer.normalize(lowerSentence);
+//
+//        System.out.println("normalized: "+normedSentence);
         
 //      tag the sentence
-        String taggedSentence = tagSentence(lowerSentence);
-    
-        System.out.println(taggedSentence);
+//        String taggedSentence = tagSentence(lowerSentence);
+
+//        System.out.println(taggedSentence);
         
         System.out.println("********");
+    
+        System.out.println(lowerSentence);
         
         
         
@@ -222,9 +230,22 @@ public class MainClass {
     
         String fileBads = "data/bads.txt";    //creates a new file instance
         List<String> badsList = readSentencesFromFile(fileBads);
+    
         
         String fileBWords = "data/blackListTurkish.txt";
         List<String> badWordsList = readSentencesFromFile(fileBWords);
+        
+        int i = 0;
+        int sizeTokensOfSentence = tokensOfSentence.size();
+        while( i < sizeTokensOfSentence ){
+        
+        
+        
+        }
+    
+//        System.out.println(tokensOfSentence.toString());
+    
+
         
         
         
@@ -333,7 +354,7 @@ public class MainClass {
             String line;
             while((line = br.readLine()) != null)
             {
-                sentences.add(line);
+                sentences.add(line.toLowerCase());
             }
             fr.close();    //closes the stream and release the resources
         }
