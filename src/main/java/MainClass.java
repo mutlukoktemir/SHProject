@@ -146,7 +146,7 @@ public class MainClass {
         String sentence = "Siktir gir a.q. göt ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
         
         String sentence2 = "merhabalar. takasa acik demissiniz. bazi studyo ekipmanlari var letgo'da. dusunur musunuz?";
-        String sentence3 = "sahibinden üzerinden havale yolu ile satıyoruz. Dilerseniz n11 mağazamızdan da site üzerinden alışveriş yapabilirsiniz. https://urun.n11.com/jant-kapagi/16-inc-jant-kapagi-kirilmaz-takim-celik-gorunumlu-P369878247";
+        String sentence3 = "sahibinden üzerinden havale yolu ile satıyoruz. Dilerseniz n11 mağazamızdan da site üzerinden alışveriş yapabilirsiniz. https://urun.n11.com/jant-kapagi/16-inc-jant-kapagi-kirilmaz-takim-celik-gorunumlu-P369878247. Siktir gir a.q. göt ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
         String sentence4 = "Sahibinden uygulamam da biraz sorun var.Fiyatı Letgoda 650ye düşürdüm";
         
         String sentence5 = "fiyati belirlemek sizin takdiriniz elbette, ama arabam.com yaklasik fiyat tahmin uygulamasinda bu arac 53800-56000 araliginda cikiyor. lpg oldugunundan ona gore bir deger artisi da olacaktir.";
@@ -159,7 +159,7 @@ public class MainClass {
 //        System.out.println(normalizer.normalize(badWordTrial));
         
 //      first step -> lower case
-        String lowerSentence = sentence6.toLowerCase();
+        String lowerSentence = sentence3.toLowerCase();
         
 //        String normedSentence = normalizer.normalize(lowerSentence);
 //
