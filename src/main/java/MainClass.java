@@ -3,6 +3,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.spec.RSAOtherPrimeInfo;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -153,13 +154,16 @@ public class MainClass {
         
         String sentence6 = "mrb.Arabam.com daki 12024423 nolu aracıma bak.üste nakit verebilirim.anlaşırsak hemen getir misafirim ol.Arabayı al git.geç olduğu için arayamadım.";
         
-        String sentence7 = "arabam comda";
+        String sentence7 = " Araba burada .";
         
 //        String badWordTrial = "Sktr";
 //        System.out.println(normalizer.normalize(badWordTrial));
         
-//      first step -> lower case
-        String lowerSentence = sentence3.toLowerCase();
+        String strTrial = "İstanbul bilişimde arkadaşım var abi ordan alicam kendi garantisi var 6t nin o şekilde var ama tabi senin benim cihaz gibi KVK li değil";
+    
+        System.out.println(strTrial.toLowerCase());
+        
+
         
 //        String normedSentence = normalizer.normalize(lowerSentence);
 //
@@ -167,14 +171,22 @@ public class MainClass {
     
     
         System.out.println("********");
-    
-        System.out.println(lowerSentence);
 
         
 //      second step -> tag the sentence
-        String taggedSentence = tagSentence(lowerSentence);
-
-        System.out.println(taggedSentence);
+//        String taggedSentence = tagSentence(sentence7);
+//
+//        List<String> tokensOfSent = tokenizeSentence(sentence7);
+//        StringBuilder stringBuilder = new StringBuilder();
+//        for(int i = 0; i < tokensOfSent.size(); ++i){
+//            stringBuilder.append(tokensOfSent.get(i)+" ");
+//        }
+//        String sentenceTok = stringBuilder.toString().trim();
+//        System.out.println(sentenceTok);
+//        System.out.println(taggedSentence);
+        
+        
+        tagSentencesFromFile("data/bads500.txt");
         
         
         
@@ -213,6 +225,58 @@ public class MainClass {
 
     }
     
+    public static void tagSentencesFromFile(String fileName){
+    
+        try
+        {
+            File file = new File(fileName);    //creates a new file instance
+            FileReader fr = new FileReader(file);   //reads the file
+            BufferedReader br = new BufferedReader(fr);  //creates a buffering character input stream
+    
+    
+            FileWriter fwTagged = null;
+            String taggedFileName = "data/tagged.txt";
+            fwTagged = new FileWriter(taggedFileName);
+            
+            
+            FileWriter fw = null;
+            String notTaggedFileName = "data/notTagged.txt";
+            fw = new FileWriter(notTaggedFileName);
+            
+        
+            String line;
+            while((line = br.readLine()) != null)
+            {
+                String taggedSent = tagSentence(line);
+                if( taggedSent != null ){
+                    if( line.compareTo(taggedSent) == 0 ){
+        
+                        fw.write(line);
+                        fw.write("\n");
+        
+                    }
+                    else{
+                        fwTagged.write(taggedSent);
+                        fwTagged.write("\n");
+                    }
+                }
+                
+                
+            }
+            
+            fr.close();
+            fwTagged.close();
+            fw.close();
+            
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+        
+        
+    }
+    
     public static String splitByPunc(String sentence){
     
         List<String> tokensOfSentence = tokenizeSentence(sentence);
@@ -230,208 +294,242 @@ public class MainClass {
     }
     
     public static String tagSentence(String sentence){
-        
-        List<String> tokensOfSentence = tokenizeSentence(sentence);
-        StringBuilder sentenceBuilder = new StringBuilder();
     
-        String fileBads = "data/bads.txt";    //creates a new file instance
-        List<String> badList = readSentencesFromFile(fileBads);
+        List<String> tokensOfSentenceOrigin = tokenizeSentence(sentence);
+        
+        String lowerSentence = sentence.toLowerCase();
+        
+        List<String> tokensOfSentence = tokenizeSentence(lowerSentence);
+        
+        
+        if( tokensOfSentenceOrigin.size() != tokensOfSentence.size() ){
+            System.out.println("something wrong");
+            System.out.println("origin:"+tokensOfSentenceOrigin.toString());
+            System.out.println("lowerr:"+tokensOfSentence.toString());
+            return null;
+        }
+        else{
     
-        
-        String fileBWords = "data/blackListShort.txt";
-        List<String> badWordList = readSentencesFromFile(fileBWords);
-        
-        int i = 0;
-        int sizeTokensOfSentence = tokensOfSentence.size();
-        while( i < sizeTokensOfSentence ){
+            StringBuilder sentenceBuilder = new StringBuilder();
             
-            boolean badCheck = false;
-            boolean badWordCheck = false;
+            String fileBads = "data/bads.txt";    //creates a new file instance
+            List<String> badList = readSentencesFromFile(fileBads);
+    
+    
+            String fileBWords = "data/blackListShort.txt";
+            List<String> badWordList = readSentencesFromFile(fileBWords);
+    
+            int i = 0;
+            int sizeTokensOfSentence = tokensOfSentence.size();
+            while( i < sizeTokensOfSentence ){
         
-            // bad list tagging
-            int badListSize = badList.size();
-            for(int badIndex = 0; badIndex < badListSize; ++badIndex ){
-                
-                String[] strArray = badList.get(badIndex).split(" ");
-                int lenString = strArray.length;
-                
-                if( lenString == 1 ){
-                    if( tokensOfSentence.get(i).indexOf(strArray[0]) >= 0 ){
-                        badCheck = true;
-                        sentenceBuilder.append("[BAD "+tokensOfSentence.get(i)+"] ");
-                        ++i;
-                        break;
-                    }
-                }else if( lenString == 2 ){
-                    
-                    if( i+1 < sizeTokensOfSentence ){
-                        
-                        StringBuilder strBuild = new StringBuilder();
-                        strBuild.append(tokensOfSentence.get(i)+" "+tokensOfSentence.get(i+1));
-                        String strToken = strBuild.toString();
-    
-                        StringBuilder strBuild2 = new StringBuilder();
-                        strBuild2.append(strArray[0]+" "+strArray[1]);
-                        String strBad = strBuild2.toString();
-    
-                        if( strToken.indexOf(strBad) >= 0 ){
-                            badCheck = true;
-                            sentenceBuilder.append("[BAD "+strToken+"] ");
-                            i += 2;
-                            break;
-                        }
-                        
-                    }
-                    
-                    
-                }else if( lenString == 3 ){
-    
-                    if( i+2 < sizeTokensOfSentence ){
-                        
-                        StringBuilder strBuild = new StringBuilder();
-                        strBuild.append(tokensOfSentence.get(i)+" "+tokensOfSentence.get(i+1)+" "+tokensOfSentence.get(i+2));
-                        String strToken = strBuild.toString();
-    
-                        StringBuilder strBuild2 = new StringBuilder();
-                        strBuild2.append(strArray[0]+" "+strArray[1]+" "+strArray[2]);
-                        String strBad = strBuild2.toString();
-    
-                        if( strToken.indexOf(strBad) >= 0 ){
-                            badCheck = true;
-                            sentenceBuilder.append("[BAD "+strToken+"] ");
-                            i += 3;
-                            break;
-                        }
-                        
-                    }
-                    
-    
-                }else if( lenString == 4 ){
-    
-                    if( i+3 < sizeTokensOfSentence ){
-                        
-                        StringBuilder strBuild = new StringBuilder();
-                        strBuild.append(tokensOfSentence.get(i)+" "+tokensOfSentence.get(i+1)+" "+tokensOfSentence.get(i+2)+" "+tokensOfSentence.get(i+3));
-                        String strToken = strBuild.toString();
-    
-                        StringBuilder strBuild2 = new StringBuilder();
-                        strBuild2.append(strArray[0]+" "+strArray[1]+" "+strArray[2]+" "+strArray[3]);
-                        String strBad = strBuild2.toString();
-    
-                        if( strToken.indexOf(strBad) >= 0 ){
-                            badCheck = true;
-                            sentenceBuilder.append("[BAD "+strToken+"] ");
-                            i += 4;
-                            break;
-                        }
-                        
-                    }
-    
-                }
-                
-                
-            }
-            // end of bad list tagging
+                boolean badCheck = false;
+                boolean badWordCheck = false;
+        
+                // bad list tagging
+                int badListSize = badList.size();
+                for(int badIndex = 0; badIndex < badListSize; ++badIndex ){
             
-            // bad word list tagging
-            int badWordListSize = badWordList.size();
-            if( !badCheck ){
-                
-                for( int badWordIndex = 0; badWordIndex < badWordListSize; ++badWordIndex ){
-    
-                    String[] strArray = badWordList.get(badWordIndex).split(" ");
+                    String[] strArray = badList.get(badIndex).split(" ");
                     int lenString = strArray.length;
-    
+            
                     if( lenString == 1 ){
-                        if( tokensOfSentence.get(i).compareTo(strArray[0]) == 0 ){
-                            badWordCheck = true;
-                            sentenceBuilder.append("[BWORD "+tokensOfSentence.get(i)+"] ");
+                        if( tokensOfSentence.get(i).indexOf(strArray[0]) >= 0 ){
+                            badCheck = true;
+                            sentenceBuilder.append("[BAD "+tokensOfSentenceOrigin.get(i)+"] ");
                             ++i;
                             break;
                         }
                     }else if( lenString == 2 ){
-    
+                
                         if( i+1 < sizeTokensOfSentence ){
-                            
+                    
                             StringBuilder strBuild = new StringBuilder();
                             strBuild.append(tokensOfSentence.get(i)+" "+tokensOfSentence.get(i+1));
                             String strToken = strBuild.toString();
-    
+                    
                             StringBuilder strBuild2 = new StringBuilder();
                             strBuild2.append(strArray[0]+" "+strArray[1]);
                             String strBad = strBuild2.toString();
-    
-                            if( strToken.compareTo(strBad) == 0 ){
-                                badWordCheck = true;
-                                sentenceBuilder.append("[BWORD "+strToken+"] ");
+                    
+                            if( strToken.indexOf(strBad) >= 0 ){
+                                badCheck = true;
+                                StringBuilder strBuild3 = new StringBuilder();
+                                strBuild3.append(tokensOfSentenceOrigin.get(i)+" "+tokensOfSentenceOrigin.get(i+1));
+                                String strToken2 = strBuild3.toString();
+                                sentenceBuilder.append("[BAD "+strToken2+"] ");
                                 i += 2;
                                 break;
                             }
-                            
+                    
                         }
-                        
-        
+                
+                
                     }else if( lenString == 3 ){
-    
+                
                         if( i+2 < sizeTokensOfSentence ){
-    
+                    
                             StringBuilder strBuild = new StringBuilder();
                             strBuild.append(tokensOfSentence.get(i)+" "+tokensOfSentence.get(i+1)+" "+tokensOfSentence.get(i+2));
                             String strToken = strBuild.toString();
-    
+                    
                             StringBuilder strBuild2 = new StringBuilder();
                             strBuild2.append(strArray[0]+" "+strArray[1]+" "+strArray[2]);
                             String strBad = strBuild2.toString();
-    
-                            if( strToken.compareTo(strBad) == 0 ){
-                                badWordCheck = true;
-                                sentenceBuilder.append("[BWORD "+strToken+"] ");
+                    
+                            if( strToken.indexOf(strBad) >= 0 ){
+                                badCheck = true;
+                                StringBuilder strBuild3 = new StringBuilder();
+                                strBuild3.append(tokensOfSentenceOrigin.get(i)+" "+tokensOfSentenceOrigin.get(i+1)+" "+tokensOfSentenceOrigin.get(i+2));
+                                String strToken2 = strBuild3.toString();
+                                sentenceBuilder.append("[BAD "+strToken2+"] ");
                                 i += 3;
                                 break;
                             }
-                            
+                    
                         }
-        
-                        
-        
+                
+                
                     }else if( lenString == 4 ){
-    
+                
                         if( i+3 < sizeTokensOfSentence ){
-    
+                    
                             StringBuilder strBuild = new StringBuilder();
                             strBuild.append(tokensOfSentence.get(i)+" "+tokensOfSentence.get(i+1)+" "+tokensOfSentence.get(i+2)+" "+tokensOfSentence.get(i+3));
                             String strToken = strBuild.toString();
-    
+                    
                             StringBuilder strBuild2 = new StringBuilder();
                             strBuild2.append(strArray[0]+" "+strArray[1]+" "+strArray[2]+" "+strArray[3]);
                             String strBad = strBuild2.toString();
-    
-                            if( strToken.compareTo(strBad) == 0 ){
-                                badWordCheck = true;
-                                sentenceBuilder.append("[BWORD "+strToken+"] ");
+                    
+                            if( strToken.indexOf(strBad) >= 0 ){
+                                badCheck = true;
+                                StringBuilder strBuild3 = new StringBuilder();
+                                strBuild3.append(tokensOfSentenceOrigin.get(i)+" "+tokensOfSentenceOrigin.get(i+1)+" "+tokensOfSentenceOrigin.get(i+2)+" "+tokensOfSentenceOrigin.get(i+3));
+                                String strToken2 = strBuild3.toString();
+                                sentenceBuilder.append("[BAD "+strToken2+"] ");
                                 i += 4;
                                 break;
                             }
-                            
+                    
                         }
-        
+                
                     }
-                
+            
+            
                 }
-                
-            }
-            // end of word list tagging
-            
-            if( !badCheck && !badWordCheck ){
-                sentenceBuilder.append(tokensOfSentence.get(i)+" ");
-                ++i;
-            }
-            
+                // end of bad list tagging
         
+                // bad word list tagging
+                int badWordListSize = badWordList.size();
+                if( !badCheck ){
+            
+                    for( int badWordIndex = 0; badWordIndex < badWordListSize; ++badWordIndex ){
+                
+                        String[] strArray = badWordList.get(badWordIndex).split(" ");
+                        int lenString = strArray.length;
+                
+                        if( lenString == 1 ){
+                            if( tokensOfSentence.get(i).compareTo(strArray[0]) == 0 ){
+                                badWordCheck = true;
+                                sentenceBuilder.append("[BWORD "+tokensOfSentenceOrigin.get(i)+"] ");
+                                ++i;
+                                break;
+                            }
+                        }else if( lenString == 2 ){
+                    
+                            if( i+1 < sizeTokensOfSentence ){
+                        
+                                StringBuilder strBuild = new StringBuilder();
+                                strBuild.append(tokensOfSentence.get(i)+" "+tokensOfSentence.get(i+1));
+                                String strToken = strBuild.toString();
+                        
+                                StringBuilder strBuild2 = new StringBuilder();
+                                strBuild2.append(strArray[0]+" "+strArray[1]);
+                                String strBad = strBuild2.toString();
+                        
+                                if( strToken.compareTo(strBad) == 0 ){
+                                    badWordCheck = true;
+                                    StringBuilder strBuild3 = new StringBuilder();
+                                    strBuild3.append(tokensOfSentenceOrigin.get(i)+" "+tokensOfSentenceOrigin.get(i+1));
+                                    String strToken2 = strBuild3.toString();
+                                    sentenceBuilder.append("[BWORD "+strToken2+"] ");
+                                    i += 2;
+                                    break;
+                                }
+                        
+                            }
+                    
+                    
+                        }else if( lenString == 3 ){
+                    
+                            if( i+2 < sizeTokensOfSentence ){
+                        
+                                StringBuilder strBuild = new StringBuilder();
+                                strBuild.append(tokensOfSentence.get(i)+" "+tokensOfSentence.get(i+1)+" "+tokensOfSentence.get(i+2));
+                                String strToken = strBuild.toString();
+                        
+                                StringBuilder strBuild2 = new StringBuilder();
+                                strBuild2.append(strArray[0]+" "+strArray[1]+" "+strArray[2]);
+                                String strBad = strBuild2.toString();
+                        
+                                if( strToken.compareTo(strBad) == 0 ){
+                                    badWordCheck = true;
+                                    StringBuilder strBuild3 = new StringBuilder();
+                                    strBuild3.append(tokensOfSentenceOrigin.get(i)+" "+tokensOfSentenceOrigin.get(i+1)+" "+tokensOfSentenceOrigin.get(i+2));
+                                    String strToken2 = strBuild3.toString();
+                                    sentenceBuilder.append("[BWORD "+strToken2+"] ");
+                                    i += 3;
+                                    break;
+                                }
+                        
+                            }
+                    
+                    
+                    
+                        }else if( lenString == 4 ){
+                    
+                            if( i+3 < sizeTokensOfSentence ){
+                        
+                                StringBuilder strBuild = new StringBuilder();
+                                strBuild.append(tokensOfSentence.get(i)+" "+tokensOfSentence.get(i+1)+" "+tokensOfSentence.get(i+2)+" "+tokensOfSentence.get(i+3));
+                                String strToken = strBuild.toString();
+                        
+                                StringBuilder strBuild2 = new StringBuilder();
+                                strBuild2.append(strArray[0]+" "+strArray[1]+" "+strArray[2]+" "+strArray[3]);
+                                String strBad = strBuild2.toString();
+                        
+                                if( strToken.compareTo(strBad) == 0 ){
+                                    badWordCheck = true;
+                                    StringBuilder strBuild3 = new StringBuilder();
+                                    strBuild3.append(tokensOfSentenceOrigin.get(i)+" "+tokensOfSentenceOrigin.get(i+1)+" "+tokensOfSentenceOrigin.get(i+2)+" "+tokensOfSentenceOrigin.get(i+3));
+                                    String strToken2 = strBuild3.toString();
+                                    sentenceBuilder.append("[BWORD "+strToken2+"] ");
+                                    i += 4;
+                                    break;
+                                }
+                        
+                            }
+                    
+                        }
+                
+                    }
+            
+                }
+                // end of word list tagging
+        
+                if( !badCheck && !badWordCheck ){
+                    sentenceBuilder.append(tokensOfSentenceOrigin.get(i)+" ");
+                    ++i;
+                }
+        
+        
+            }
+    
+    
+            return sentenceBuilder.toString().trim();
         }
         
-        
-        return sentenceBuilder.toString().trim();
     }
     
     

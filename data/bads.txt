@@ -1,6 +1,8 @@
 www
 https:
 arabamcom
+arabam . com
+araba . com
 arabam.co
 arabam com
 arabam c o m
@@ -9,12 +11,16 @@ araba.co
 araba com
 amazon.c
 amazon
+emlak jet
+emlakjet
 letgo
 letko
 let go
 sanalpazar
 sanal pazar
 hepsiburada
+hepsıburada
+hepsı burada
 hepsi burada
 facebook
 trendyol
@@ -22,7 +28,10 @@ trend yol
 vatanbilgisayar
 vatan bilgisayar
 istanbulbilisim
+İstanbulbilisim
 istanbul bilişim
+İstanbul bilişim
+İstanbul bilisim
 istanbul bilisim
 n11
 gittigidiyor
@@ -31,6 +40,7 @@ aliexpress
 ali express
 morhipo
 ikea
+İkea
 hurriyetemlak
 hurriyet emlak
 hürriyet emlak
