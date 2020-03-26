@@ -1,1 +1,9 @@
 .idea/
+data/bads.txt
+data/bads500.txt
+data/blackListShort.txt
+data/blackListTurkish.txt
+data/check.txt
+data/nlp.txt
+data/notTagged.txt
+data/tagged.txt
