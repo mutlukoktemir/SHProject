@@ -38,86 +38,6 @@ public class MainClass {
     /**
      * Main method. With an example usage of this class.
      */
-//    public static void main(String[] args) throws IOException {
-//
-//
-//        Classifier m_Classifier = null;
-//
-//        Path lookupRoot = Paths.get("/Users/test/IdeaProjects/message analysis/data/normalization");
-//        Path lmFile = Paths.get("/Users/test/IdeaProjects/message analysis/data/lm/lm.2gram.slm");
-//        TurkishMorphology morphology = TurkishMorphology.createWithDefaults();
-//        TurkishSentenceNormalizer normalizer = new
-//                TurkishSentenceNormalizer(morphology, lookupRoot, lmFile);
-//
-//        //TurkishMorphology morphology = TurkishMorphology.createWithDefaults();
-//
-//        String sentence = "Siktir gir göt ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
-//        String normalizedSentence = normalizer.normalize(sentence);
-//        System.out.println(normalizedSentence);
-//
-//        System.out.println("--");
-//
-//        String[] arr = normalizedSentence.split(" ");
-//
-//        for ( String ss : arr)
-//            System.out.println(ss);
-//
-//
-////        WordAnalysis results = morphology.analyze(sentence);
-////        for (SingleAnalysis result : results)
-////            System.out.println(result);
-//
-//        Log.info("Word = " + arr[0]);
-//        WordAnalysis results = morphology.analyze(arr[0]);
-//
-//        for (SingleAnalysis result : results) {
-//            Log.info(result);
-//            Log.info("Lexical and Surface : " + result.formatLong());
-//            Log.info("Only Lexical        : " + result.formatLexical());
-//            Log.info("Oflazer style       : " +
-//                    AnalysisFormatters.OFLAZER_STYLE.format(result));
-//            Log.info();
-//        }
-//
-//        final String MODEL = "models/sms.dat";
-//
-//        WekaClassifier wt = new WekaClassifier();
-//
-//        if (new File(MODEL).exists()) {
-//            wt.loadModel(MODEL);
-//        } else {
-//            wt.transform();
-//            wt.fit();
-//            wt.saveModel(MODEL);
-//        }
-//
-//        Logger logger
-//                = Logger.getLogger(
-//                MainClass.class.getName());
-//
-//        //run few predictions
-//        logger.info("text 'how are you' is " + wt.predict("how are you ?"));
-//        logger.info("text 'u have won the 1 lakh prize' is " + wt.predict("u have won the 1 lakh prize"));
-//
-//        //run evaluation
-//        logger.info("Evaluation Result: \n"+wt.evaluate());
-//
-//
-////        // load CSV
-////        CSVLoader loader = new CSVLoader();
-////        loader.setSource(new File("/Users/test/IdeaProjects/message analysis/data/real_train_set.csv"));
-////        Instances data = loader.getDataSet();
-////
-////        // save ARFF
-////        ArffSaver saver = new ArffSaver();
-////        saver.setInstances(data);
-////        saver.setFile(new File("/Users/test/IdeaProjects/message analysis/data/real_train_set.arff"));
-////        saver.setDestination(new File("/Users/test/IdeaProjects/message analysis/data/real_train_set.arff"));
-////        saver.writeBatch();
-//
-//        System.out.println("done.");
-//
-//    }
     public static void main(String[] args) throws Exception {
 
         String trainingFileName = new String("data/real_train_set.arff");
@@ -146,44 +66,12 @@ public class MainClass {
 
         String sentence = "Siktir gir a.q. göt ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
         
-        String sentence2 = "merhabalar. takasa acik demissiniz. bazi studyo ekipmanlari var letgo'da. dusunur musunuz?";
-        String sentence3 = "sahibinden üzerinden havale yolu ile satıyoruz. Dilerseniz n11 mağazamızdan da site üzerinden alışveriş yapabilirsiniz. https://urun.n11.com/jant-kapagi/16-inc-jant-kapagi-kirilmaz-takim-celik-gorunumlu-P369878247. Siktir gir a.q. göt ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
-        String sentence4 = "Sahibinden uygulamam da biraz sorun var.Fiyatı Letgoda 650ye düşürdüm";
-        
-        String sentence5 = "fiyati belirlemek sizin takdiriniz elbette, ama arabam.com yaklasik fiyat tahmin uygulamasinda bu arac 53800-56000 araliginda cikiyor. lpg oldugunundan ona gore bir deger artisi da olacaktir.";
-        
-        String sentence6 = "mrb.Arabam.com daki 12024423 nolu aracıma bak.üste nakit verebilirim.anlaşırsak hemen getir misafirim ol.Arabayı al git.geç olduğu için arayamadım.";
-        
-        String sentence7 = " Araba burada .";
-        
-//        String badWordTrial = "Sktr";
-//        System.out.println(normalizer.normalize(badWordTrial));
-        
-        String strTrial = "İstanbul bilişimde arkadaşım var abi ordan alicam kendi garantisi var 6t nin o şekilde var ama tabi senin benim cihaz gibi KVK li değil";
-    
-        System.out.println(strTrial.toLowerCase());
-        
 
-        
 //        String normedSentence = normalizer.normalize(lowerSentence);
 //
 //        System.out.println("normalized: "+normedSentence);
-    
-    
-        System.out.println("********");
 
         
-//      second step -> tag the sentence
-//        String taggedSentence = tagSentence(sentence7);
-//
-//        List<String> tokensOfSent = tokenizeSentence(sentence7);
-//        StringBuilder stringBuilder = new StringBuilder();
-//        for(int i = 0; i < tokensOfSent.size(); ++i){
-//            stringBuilder.append(tokensOfSent.get(i)+" ");
-//        }
-//        String sentenceTok = stringBuilder.toString().trim();
-//        System.out.println(sentenceTok);
-//        System.out.println(taggedSentence);
         
         
         tagSentencesFromFile("data/bads500.txt");
@@ -211,14 +99,6 @@ public class MainClass {
             
         }
         */
-        
-    
-        System.out.println("000000000000");
-    
-       
-        
-        //  morphology
-        TurkishMorphology analyzer = TurkishMorphology.builder().setLexicon(RootLexicon.getDefault()).disableCache().build();
         
         
 
@@ -275,22 +155,6 @@ public class MainClass {
         }
         
         
-    }
-    
-    public static String splitByPunc(String sentence){
-    
-        List<String> tokensOfSentence = tokenizeSentence(sentence);
-    
-        StringBuilder stringBuilder = new StringBuilder();
-        for(String token:tokensOfSentence) {
-//            System.out.println("token: " + token);
-            stringBuilder.append(token);
-            stringBuilder.append(" ");
-        }
-        String sent = stringBuilder.toString().trim();
-//        System.out.println("punc: "+sent);
-        
-        return sent;
     }
     
     public static String tagSentence(String sentence){
@@ -548,6 +412,24 @@ public class MainClass {
         
         return tokens;
     }
+    
+    
+    public static String splitByPunc(String sentence){
+        
+        List<String> tokensOfSentence = tokenizeSentence(sentence);
+        
+        StringBuilder stringBuilder = new StringBuilder();
+        for(String token:tokensOfSentence) {
+//            System.out.println("token: " + token);
+            stringBuilder.append(token);
+            stringBuilder.append(" ");
+        }
+        String sent = stringBuilder.toString().trim();
+//        System.out.println("punc: "+sent);
+        
+        return sent;
+    }
+    
     
     public static void fileWrite(String fileName, List<String> sentences){
     
