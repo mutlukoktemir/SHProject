@@ -4,10 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.spec.RSAOtherPrimeInfo;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 import weka.classifiers.bayes.NaiveBayesMultinomial;
 
@@ -74,8 +71,8 @@ public class MainClass {
         
         
         
-        tagSentencesFromFile("data/bads500.txt");
-        
+//        tagSentencesFromFile("data/bads500.txt");
+        orderStringsInFileByLength("data/blackListShort.txt");
         
         
         
@@ -103,6 +100,74 @@ public class MainClass {
         
 
 
+    }
+    
+    
+    public static void orderStringsInFileByLength(String fileName){
+        try
+        {
+            File file = new File(fileName);    //creates a new file instance
+            FileReader fr = new FileReader(file);   //reads the file
+            BufferedReader br = new BufferedReader(fr);  //creates a buffering character input stream
+        
+        
+        
+            List<String> listBlackList = new ArrayList<>();
+            String line;
+            int maxLength = 0;
+            while((line = br.readLine()) != null)
+            {
+                int lengthOfString = line.length();
+                
+                if( maxLength < lengthOfString ){
+                    maxLength = lengthOfString;
+                }
+                
+                listBlackList.add(line);
+                
+            }
+            fr.close();
+    
+    
+            FileWriter fw = null;
+            fw = new FileWriter("data/blackListShortOrderedByLength.txt");
+            
+            for(int i = maxLength; i > 0; --i){
+            
+                List<String> listStr = new ArrayList<>();
+                int sizeOfBlackList = listBlackList.size();
+                
+                for(int j = 0; j < sizeOfBlackList; ++j){
+    
+                    String strTemp = listBlackList.get(j);
+                    String[] strArray = strTemp.split(" ");
+                    
+                    if( strArray.length == i ){
+                        listStr.add(strTemp);
+                    }
+                    
+                }
+                
+                java.util.Collections.sort(listStr);
+                int sizeOfListStr = listStr.size();
+                
+                for(int k = 0; k < sizeOfListStr; ++k){
+                    fw.write(listStr.get(k));
+                    fw.write("\n");
+                }
+                
+            
+            }
+            
+            
+            fw.close();
+            
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+        
     }
     
     public static void tagSentencesFromFile(String fileName){
