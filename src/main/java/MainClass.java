@@ -6,6 +6,9 @@ import java.nio.file.Paths;
 import java.security.spec.RSAOtherPrimeInfo;
 import java.util.*;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import weka.classifiers.bayes.NaiveBayesMultinomial;
 
 import weka.classifiers.functions.LinearRegression;
@@ -27,10 +30,14 @@ import zemberek.normalization.TurkishSentenceNormalizer;
 import zemberek.tokenization.Token;
 import zemberek.tokenization.TurkishTokenizer;
 
+import javax.activation.FileDataSource;
+
 public class MainClass {
 
     private static MyFilteredLearner learner;
     private static MyFilteredClassifier classifier;
+    
+    private static Locale trLocale = new Locale("tr","TR");
 
     /**
      * Main method. With an example usage of this class.
@@ -63,16 +70,24 @@ public class MainClass {
 
         String sentence = "Siktir gir a.q. göt ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
         
+        String sentence2 = "Çok Şazla yoruma gerek yÖk . Çünkü HEPSİBURADA sitesi on line alış veriş konusunda Ilk 5te .";
+    
+//        System.out.println("origin: " + sentence2);
+//        System.out.println("lowerD: " + sentence2.toLowerCase());
+//        System.out.println("lowerT: " + sentence2.toLowerCase(trLocale));
+        
 
 //        String normedSentence = normalizer.normalize(lowerSentence);
 //
 //        System.out.println("normalized: "+normedSentence);
 
-        
-        
-        
-//        tagSentencesFromFile("data/bads500.txt");
-        orderStringsInFileByLength("data/blackListShort.txt");
+
+
+
+//        orderStringsInFileByLength("data/blackListShort.txt","data/blackListShortOrderedByLength.txt");
+//        orderStringsInFileByLength("data/bads.txt","data/badsOrderedByLength.txt");
+//
+//        tagSentencesFromFile("data/mk_hb_train_set1.txt");
         
         
         
@@ -98,12 +113,42 @@ public class MainClass {
         */
         
         
-
+//        generateTrainingFileFromCsv("data/hb.csv");
 
     }
     
     
-    public static void orderStringsInFileByLength(String fileName){
+    public static void generateTrainingFileFromCsv(String fileName) throws IOException {
+    
+        String[] HEADERS = { "Rating (Star)", "Review", "URL"};
+    
+        Reader in = new FileReader(fileName);
+        Iterable<CSVRecord> records = CSVFormat.DEFAULT.withHeader(HEADERS).withFirstRecordAsHeader().parse(in);
+    
+        
+        for (CSVRecord record : records) {
+            String reviewStr = record.get("Review");
+            
+            String[] strArray = reviewStr.split(" ");
+            
+            List<String> strList = new ArrayList<>();
+            
+            int randomIndex = (int)Math.random() % strArray.length;
+            
+            int whichBadWordFile = (int)Math.random() % 2;
+            
+            
+            
+            
+        }
+        
+        
+    
+    
+    }
+    
+    
+    public static void orderStringsInFileByLength(String fileName, String orderedFileName){
         try
         {
             File file = new File(fileName);    //creates a new file instance
@@ -130,7 +175,7 @@ public class MainClass {
     
     
             FileWriter fw = null;
-            fw = new FileWriter("data/blackListShortOrderedByLength.txt");
+            fw = new FileWriter(orderedFileName);
             
             for(int i = maxLength; i > 0; --i){
             
@@ -180,12 +225,12 @@ public class MainClass {
     
     
             FileWriter fwTagged = null;
-            String taggedFileName = "data/tagged.txt";
+            String taggedFileName = "data/tagged_hb_training.txt";
             fwTagged = new FileWriter(taggedFileName);
             
             
             FileWriter fw = null;
-            String notTaggedFileName = "data/notTagged.txt";
+            String notTaggedFileName = "data/notTagged_hb_training.txt";
             fw = new FileWriter(notTaggedFileName);
             
         
@@ -226,7 +271,7 @@ public class MainClass {
     
         List<String> tokensOfSentenceOrigin = tokenizeSentence(sentence);
         
-        String lowerSentence = sentence.toLowerCase();
+        String lowerSentence = sentence.toLowerCase(trLocale);
         
         List<String> tokensOfSentence = tokenizeSentence(lowerSentence);
         
@@ -241,11 +286,11 @@ public class MainClass {
     
             StringBuilder sentenceBuilder = new StringBuilder();
             
-            String fileBads = "data/bads.txt";    //creates a new file instance
+            String fileBads = "data/badsOrderedByLength.txt";    //creates a new file instance
             List<String> badList = readSentencesFromFile(fileBads);
     
     
-            String fileBWords = "data/blackListShort.txt";
+            String fileBWords = "data/blackListShortOrderedByLength.txt";
             List<String> badWordList = readSentencesFromFile(fileBWords);
     
             int i = 0;
@@ -445,7 +490,7 @@ public class MainClass {
                     }
             
                 }
-                // end of word list tagging
+                // end of bad word list tagging
         
                 if( !badCheck && !badWordCheck ){
                     sentenceBuilder.append(tokensOfSentenceOrigin.get(i)+" ");
