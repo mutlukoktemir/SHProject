@@ -106,7 +106,7 @@ public class MainClass {
 //        orderStringsInFileByNumOfWords("data/blackListShort.txt","data/blackListShortOrderedByNumOfWords.txt");
 //        orderStringsInFileByNumOfWords("data/bads.txt","data/badsOrderedByNumOfWords.txt");
 //
-        tagSentencesFromFile("data/mk_hb_train_set1.txt");
+//        tagSentencesFromFile("data/mk_hb_train_set1.txt");
         
         
         
