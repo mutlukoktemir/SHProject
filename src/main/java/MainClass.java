@@ -72,40 +72,33 @@ public class MainClass {
         
         String sentence2 = "Çok Şazla yoruma gerek yÖk . Çünkü HEPSİBURADA sitesi on line alış veriş konusunda Ilk 5te .";
         
-//        String sentence3 = "Ürünü yorumlara bakarak aldım iyi https: ki de almışım :D. Uygun fiyat ve yüksek kalitede bir ürün pişman olmazsınız . Tavsiye ederim";
-//    
+//        String sentence3 = "Ürünü yorumlara bakarak aldım iyi https://w ki de almışım :D. Uygun'da fiyat ve yüksek kalitede bir ürün pişman olmazsınız . Tavsiye ederim";
+//
 //        List<String> tokensOfSentenceOrigin = tokenizeSentence(sentence3);
-//        
+//
 //        StringBuilder strBuild = new StringBuilder();
 //        for(int i = 0; i < tokensOfSentenceOrigin.size(); ++i){
 //            strBuild.append(tokensOfSentenceOrigin.get(i)+" ");
 //        }
-//    
-//        System.out.println("origin:");
-//        System.out.println(strBuild.toString());
-//    
-//        String lowerSentence3 = sentence3.toLowerCase(trLocale);
-//    
-//        List<String> tokensOfSentence = tokenizeSentence(lowerSentence3);
-//    
-//        StringBuilder strBuild2 = new StringBuilder();
-//        for(int i = 0; i < tokensOfSentence.size(); ++i){
-//            strBuild2.append(tokensOfSentence.get(i)+" ");
-//        }
-//    
-//        System.out.println("lower:");
-//        System.out.println(strBuild2.toString());
-        
-        
-    
-//        System.out.println("origin: " + sentence2);
-//        System.out.println("lowerD: " + sentence2.toLowerCase());
-//        System.out.println("lowerT: " + sentence2.toLowerCase(trLocale));
-        
-
-//        String normedSentence = normalizer.normalize(lowerSentence);
 //
-//        System.out.println("normalized: "+normedSentence);
+//        System.out.println("origin:");
+//        String strOrg = strBuild.toString();
+//        System.out.println(strOrg);
+//
+//        String lowerSentence3 = strOrg.toLowerCase(trLocale);
+//
+//        String[] lowerStrArray = lowerSentence3.split(" ");
+//        StringBuilder strBuild2 = new StringBuilder();
+//
+//        for(int i = 0; i < lowerStrArray.length; ++i){
+//            strBuild2.append(lowerStrArray[i]+" ");
+//        }
+//
+//        String strLower = strBuild2.toString().trim();
+//
+//        System.out.println("lower:");
+//        System.out.println(strLower);
+
 
 
 
@@ -113,7 +106,7 @@ public class MainClass {
 //        orderStringsInFileByNumOfWords("data/blackListShort.txt","data/blackListShortOrderedByNumOfWords.txt");
 //        orderStringsInFileByNumOfWords("data/bads.txt","data/badsOrderedByNumOfWords.txt");
 //
-//        tagSentencesFromFile("data/mk_hb_train_set1.txt");
+        tagSentencesFromFile("data/mk_hb_train_set1.txt");
         
         
         
@@ -314,9 +307,21 @@ public class MainClass {
     
         List<String> tokensOfSentenceOrigin = tokenizeSentence(sentence);
         
-        String lowerSentence = sentence.toLowerCase(trLocale);
+        StringBuilder strBld = new StringBuilder();
         
-        List<String> tokensOfSentence = tokenizeSentence(lowerSentence);
+        for(int i = 0; i < tokensOfSentenceOrigin.size(); ++i){
+            strBld.append(tokensOfSentenceOrigin.get(i)+" ");
+        }
+        String strOrg = strBld.toString().trim();
+        
+        String lowerSentence = strOrg.toLowerCase(trLocale);
+        
+//        List<String> tokensOfSentence = tokenizeSentence(lowerSentence);
+        List<String> tokensOfSentence = new ArrayList<>();
+        String[] strArrayLower = lowerSentence.split(" ");
+        for(int i = 0; i < strArrayLower.length; ++i){
+            tokensOfSentence.add(strArrayLower[i]);
+        }
         
         
         if( tokensOfSentenceOrigin.size() != tokensOfSentence.size() ){
