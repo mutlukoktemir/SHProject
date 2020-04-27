@@ -71,6 +71,32 @@ public class MainClass {
         String sentence = "Siktir gir a.q. göt ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
         
         String sentence2 = "Çok Şazla yoruma gerek yÖk . Çünkü HEPSİBURADA sitesi on line alış veriş konusunda Ilk 5te .";
+        
+//        String sentence3 = "Ürünü yorumlara bakarak aldım iyi https: ki de almışım :D. Uygun fiyat ve yüksek kalitede bir ürün pişman olmazsınız . Tavsiye ederim";
+//    
+//        List<String> tokensOfSentenceOrigin = tokenizeSentence(sentence3);
+//        
+//        StringBuilder strBuild = new StringBuilder();
+//        for(int i = 0; i < tokensOfSentenceOrigin.size(); ++i){
+//            strBuild.append(tokensOfSentenceOrigin.get(i)+" ");
+//        }
+//    
+//        System.out.println("origin:");
+//        System.out.println(strBuild.toString());
+//    
+//        String lowerSentence3 = sentence3.toLowerCase(trLocale);
+//    
+//        List<String> tokensOfSentence = tokenizeSentence(lowerSentence3);
+//    
+//        StringBuilder strBuild2 = new StringBuilder();
+//        for(int i = 0; i < tokensOfSentence.size(); ++i){
+//            strBuild2.append(tokensOfSentence.get(i)+" ");
+//        }
+//    
+//        System.out.println("lower:");
+//        System.out.println(strBuild2.toString());
+        
+        
     
 //        System.out.println("origin: " + sentence2);
 //        System.out.println("lowerD: " + sentence2.toLowerCase());
@@ -84,8 +110,8 @@ public class MainClass {
 
 
 
-//        orderStringsInFileByLength("data/blackListShort.txt","data/blackListShortOrderedByLength.txt");
-//        orderStringsInFileByLength("data/bads.txt","data/badsOrderedByLength.txt");
+//        orderStringsInFileByNumOfWords("data/blackListShort.txt","data/blackListShortOrderedByNumOfWords.txt");
+//        orderStringsInFileByNumOfWords("data/bads.txt","data/badsOrderedByNumOfWords.txt");
 //
 //        tagSentencesFromFile("data/mk_hb_train_set1.txt");
         
@@ -148,36 +174,53 @@ public class MainClass {
     }
     
     
-    public static void orderStringsInFileByLength(String fileName, String orderedFileName){
+    public static void orderStringsInFileByNumOfWords(String fileName, String orderedFileName){
         try
         {
             File file = new File(fileName);    //creates a new file instance
             FileReader fr = new FileReader(file);   //reads the file
             BufferedReader br = new BufferedReader(fr);  //creates a buffering character input stream
-        
-        
-        
-            List<String> listBlackList = new ArrayList<>();
+    
+    
+    
+            Set<String> hash_Set = new HashSet<String>();
             String line;
-            int maxLength = 0;
+            int maxNumOfWords = 0;
             while((line = br.readLine()) != null)
             {
-                int lengthOfString = line.length();
-                
-                if( maxLength < lengthOfString ){
-                    maxLength = lengthOfString;
+                if( hash_Set.contains(line) ){
+                    System.out.println(line);
+                }
+                else{
+                    
+                    String[] strArray = line.split(" ");
+                    int numOfWords = strArray.length;
+    
+                    if( maxNumOfWords < numOfWords ){
+                        maxNumOfWords = numOfWords;
+                    }
+    
+                    hash_Set.add(line);
                 }
                 
-                listBlackList.add(line);
                 
             }
             fr.close();
+            
+            
+            List<String> listBlackList = new ArrayList<>();
+            
+            Iterator<String> iterHashSet = hash_Set.iterator();
+            
+            while( iterHashSet.hasNext() ){
+                listBlackList.add(iterHashSet.next());
+            }
     
     
             FileWriter fw = null;
             fw = new FileWriter(orderedFileName);
             
-            for(int i = maxLength; i > 0; --i){
+            for(int i = maxNumOfWords; i > 0; --i){
             
                 List<String> listStr = new ArrayList<>();
                 int sizeOfBlackList = listBlackList.size();
@@ -286,11 +329,11 @@ public class MainClass {
     
             StringBuilder sentenceBuilder = new StringBuilder();
             
-            String fileBads = "data/badsOrderedByLength.txt";    //creates a new file instance
+            String fileBads = "data/badsOrderedByNumOfWords.txt";    //creates a new file instance
             List<String> badList = readSentencesFromFile(fileBads);
     
     
-            String fileBWords = "data/blackListShortOrderedByLength.txt";
+            String fileBWords = "data/blackListShortOrderedByNumOfWords.txt";
             List<String> badWordList = readSentencesFromFile(fileBWords);
     
             int i = 0;
