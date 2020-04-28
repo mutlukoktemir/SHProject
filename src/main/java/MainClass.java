@@ -108,7 +108,27 @@ public class MainClass {
 //
 //        tagSentencesFromFile("data/mk_hb_train_set1.txt");
         
-        
+//        generateNerModel("data/tagged_hb_training.txt","data/mk_hb_test_set1.txt","data/my-hb-ner-model");
+    
+//        try {
+//            File myObj = new File("data/mk_hb_test_set2.txt");
+//            Scanner myReader = new Scanner(myObj);
+//            int i = 0;
+//            while (myReader.hasNextLine()) {
+//                String data = myReader.nextLine();
+//                System.out.println("test sentence:\n"+data+"\nResults from ner model:\n");
+//                useNer("data/my-hb-ner-model",data);
+//                ++i;
+//                if( i == 63 )
+//                    break;
+//            }
+//            myReader.close();
+//        } catch (FileNotFoundException e) {
+//            System.out.println("An error occurred.");
+//            e.printStackTrace();
+//        }
+    
+//        useNer("data/my-hb-ner-model","hüremlak.com da gördüğüm ilan için aramıştım.");
         
         /*
         List<SingleAnalysis> singleAnalysisList = morphology.analyzeAndDisambiguate(sentence).bestAnalysis();
@@ -572,6 +592,49 @@ public class MainClass {
     }
     
     
+    public static void generateNerModel(String trainingFile, String testFile, String modelFile) throws IOException {
+        // you will need ner-train and ner-test files to run this example.
+        
+        Path trainPath = Paths.get(trainingFile);
+        Path testPath = Paths.get(testFile);
+        Path modelRoot = Paths.get(modelFile);
+        
+        NerDataSet trainingSet = NerDataSet.load(trainPath, NerDataSet.AnnotationStyle.BRACKET);
+        Log.info(trainingSet.info()); // prints information
+        
+        NerDataSet testSet = NerDataSet.load(testPath, NerDataSet.AnnotationStyle.BRACKET);
+        Log.info(testSet.info());
+        
+        TurkishMorphology morphology = TurkishMorphology.createWithDefaults();
+        
+        // Training occurs here. Result is a PerceptronNer instance.
+        // There will be 7 iterations with 0.1 learning rate.
+        PerceptronNer ner = new PerceptronNerTrainer(morphology).train(trainingSet, testSet, 7, 0.1f);
+        
+        Files.createDirectories(modelRoot);
+        ner.saveModelAsText(modelRoot);
+    }
+    
+    public static void useNer(String modelFile, String sentence) throws IOException {
+        // assumes you generated a model in my-model directory.
+        Path modelRoot = Paths.get(modelFile);
+        
+        TurkishMorphology morphology = TurkishMorphology.createWithDefaults();
+        
+        PerceptronNer ner = PerceptronNer.loadModel(modelRoot, morphology);
+        
+//        String sentence = "Ali Kaan yarın İstanbul'a gidecek.";
+        
+        NerSentence result = ner.findNamedEntities(sentence);
+        
+        List<NamedEntity> namedEntities = result.getNamedEntities();
+        
+        for (NamedEntity namedEntity : namedEntities) {
+            System.out.println(namedEntity);
+        }
+    }
+    
+    
     public static String splitByPunc(String sentence){
         
         List<String> tokensOfSentence = tokenizeSentence(sentence);
@@ -639,48 +702,6 @@ public class MainClass {
 //        System.out.println("reading is done.");
     
         return sentences;
-    }
-
-    public static void generateNerModel() throws IOException {
-        // you will need ner-train and ner-test files to run this example.
-
-        Path trainPath = Paths.get("data/ner-train");
-        Path testPath = Paths.get("data/ner-test");
-        Path modelRoot = Paths.get("data/my-model");
-
-        NerDataSet trainingSet = NerDataSet.load(trainPath, NerDataSet.AnnotationStyle.BRACKET);
-        Log.info(trainingSet.info()); // prints information
-
-        NerDataSet testSet = NerDataSet.load(testPath, NerDataSet.AnnotationStyle.BRACKET);
-        Log.info(testSet.info());
-
-        TurkishMorphology morphology = TurkishMorphology.createWithDefaults();
-
-        // Training occurs here. Result is a PerceptronNer instance.
-        // There will be 7 iterations with 0.1 learning rate.
-        PerceptronNer ner = new PerceptronNerTrainer(morphology).train(trainingSet, testSet, 13, 0.1f);
-
-        Files.createDirectories(modelRoot);
-        ner.saveModelAsText(modelRoot);
-    }
-
-    public static void useNer() throws IOException {
-        // assumes you generated a model in my-model directory.
-        Path modelRoot = Paths.get("data/my-model");
-
-        TurkishMorphology morphology = TurkishMorphology.createWithDefaults();
-
-        PerceptronNer ner = PerceptronNer.loadModel(modelRoot, morphology);
-
-        String sentence = "Ali Kaan yarın İstanbul'a gidecek.";
-
-        NerSentence result = ner.findNamedEntities(sentence);
-
-        List<NamedEntity> namedEntities = result.getNamedEntities();
-
-        for (NamedEntity namedEntity : namedEntities) {
-            System.out.println(namedEntity);
-        }
     }
 
     public static void withNaive(String trainingFileName, String testFileName) throws Exception {
