@@ -65,12 +65,12 @@ public class MainClass {
         Path lmFile = Paths.get("data/lm/lm.2gram.slm");
         
 //        TurkishMorphology morphology = TurkishMorphology.createWithDefaults();
-        TurkishMorphology morphology = TurkishMorphology.builder().setLexicon(RootLexicon.getDefault()).useInformalAnalysis().build();
-        TurkishSentenceNormalizer normalizer = new TurkishSentenceNormalizer(morphology, lookupRoot, lmFile);
+//        TurkishMorphology morphology = TurkishMorphology.builder().setLexicon(RootLexicon.getDefault()).useInformalAnalysis().build();
+//        TurkishSentenceNormalizer normalizer = new TurkishSentenceNormalizer(morphology, lookupRoot, lmFile);
 
         String sentence = "Siktir gir a.q. göt ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
         
-        String sentence2 = "Çok Şazla yoruma gerek yÖk . Çünkü HEPSİBURADA sitesi on line alış veriş konusunda Ilk 5te .";
+        String sentence2 = "Çok Şazla yoruma gerek yÖk . Çünkü hepsiburada sitesi on line alış veriş konusunda Ilk 5te .";
         
 //        String sentence3 = "Ürünü yorumlara bakarak aldım iyi https://w ki de almışım :D. Uygun'da fiyat ve yüksek kalitede bir ürün pişman olmazsınız . Tavsiye ederim";
 //
@@ -107,7 +107,7 @@ public class MainClass {
 //        orderStringsInFileByNumOfWords("data/bads.txt","data/badsOrderedByNumOfWords.txt");
 //
 //        tagSentencesFromFile("data/mk_hb_train_set1.txt");
-        
+//
 //        generateNerModel("data/tagged_hb_training.txt","data/mk_hb_test_set1.txt","data/my-hb-ner-model");
     
 //        try {
@@ -128,7 +128,20 @@ public class MainClass {
 //            e.printStackTrace();
 //        }
     
-//        useNer("data/my-hb-ner-model","hüremlak.com da gördüğüm ilan için aramıştım.");
+        String sentence3 = "siktiriniz hüremlak ta gördüğüm ilan için YouTubeda aramıştım.";
+        String sentence4 = "orosbu yapma ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
+        
+//        System.out.println("Sentence:" + sentence3);
+        
+        PerceptronNer myNer = generatePerceptronNer("data/my-hb-ner-model");
+        
+        
+        String testFile1 = "data/mk_hb_test_set1.txt";
+        
+//        testNerModelZ(myNer,testFile1);
+        
+//        useNer(myNer,sentence4);
+        
         
         /*
         List<SingleAnalysis> singleAnalysisList = morphology.analyzeAndDisambiguate(sentence).bestAnalysis();
@@ -154,6 +167,50 @@ public class MainClass {
         
 //        generateTrainingFileFromCsv("data/hb.csv");
 
+    }
+    
+    public static void testNerModelZ(PerceptronNer myNer, String testFileName) throws IOException {
+    
+    
+        List<String> listOfString = readSentencesFromFile(testFileName);
+    
+        ListIterator<String> listIteratorOfStrings = listOfString.listIterator();
+    
+        int truePositive = 0, falsePositive = 0, trueNegative = 0, falseNegative = 0;
+        double accuracy = 0.0, precision = 0.0, recall = 0.0;
+    
+        while( listIteratorOfStrings.hasNext() ){
+            int index = listIteratorOfStrings.nextIndex() + 1;
+        
+            boolean checkFound = useNer(myNer,listIteratorOfStrings.next());
+        
+            if( index % 20 == 0 || index % 20 == 18 || index % 20 == 19)
+            {
+                if( checkFound )
+                    truePositive++;
+                else
+                    falsePositive++;
+            
+            }
+            else
+            {
+                if( !checkFound )
+                    trueNegative++;
+                else
+                    falseNegative++;
+            }
+        
+        }
+    
+        System.out.println("TruePositive: " + truePositive + "\nTrueNegative: " + trueNegative + "\nFalsePositive: " + falsePositive + "\nFalseNegative: " + falseNegative);
+    
+        accuracy = (double)(truePositive + trueNegative) / (double)(truePositive + trueNegative + falseNegative + falsePositive);
+        precision = (double)(truePositive) / (double)(truePositive+falsePositive);
+        recall = (double)(truePositive) / (double)(truePositive+falseNegative);
+    
+        System.out.println("Accuracy: " + accuracy + "\nPrecision: " + precision + "\nRecall: " + recall);
+    
+    
     }
     
     
@@ -615,15 +672,21 @@ public class MainClass {
         ner.saveModelAsText(modelRoot);
     }
     
-    public static void useNer(String modelFile, String sentence) throws IOException {
+    public static PerceptronNer generatePerceptronNer(String modelFile) throws IOException {
         // assumes you generated a model in my-model directory.
         Path modelRoot = Paths.get(modelFile);
-        
         TurkishMorphology morphology = TurkishMorphology.createWithDefaults();
-        
+    
         PerceptronNer ner = PerceptronNer.loadModel(modelRoot, morphology);
         
+        return ner;
+    }
+    
+    public static boolean useNer(PerceptronNer ner, String sentence) throws IOException {
+    
 //        String sentence = "Ali Kaan yarın İstanbul'a gidecek.";
+    
+        System.out.println("Sentence:" + sentence);
         
         NerSentence result = ner.findNamedEntities(sentence);
         
@@ -632,6 +695,8 @@ public class MainClass {
         for (NamedEntity namedEntity : namedEntities) {
             System.out.println(namedEntity);
         }
+        
+        return !namedEntities.isEmpty();
     }
     
     
@@ -779,7 +844,7 @@ public class MainClass {
 
             while (myReader.hasNextLine()) {
                 String data = myReader.nextLine();
-                if( i % 18 == 0 || i % 19 == 0 || i % 20 == 0)
+                if( i % 20 == 0 || i % 20 == 18 || i % 20 == 19)
                 {
                     if( data.equals("bad") )
                         truePositive++;
