@@ -128,8 +128,9 @@ public class MainClass {
 //            e.printStackTrace();
 //        }
     
-        String sentence3 = "siktiriniz hüremlak ta gördüğüm ilan için YouTubeda aramıştım.";
+        String sentence3 = "hüremlak ta gördüğüm ilan için aramıştım.";
         String sentence4 = "orosbu yapma ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
+        String sentence5 = "piç motor mu araç";
         
 //        System.out.println("Sentence:" + sentence3);
         
@@ -140,7 +141,7 @@ public class MainClass {
         
 //        testNerModelZ(myNer,testFile1);
         
-//        useNer(myNer,sentence4);
+        useNer(myNer,sentence3);
         
         
         /*
