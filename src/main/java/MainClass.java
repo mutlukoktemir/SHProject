@@ -137,11 +137,15 @@ public class MainClass {
         PerceptronNer myNer = generatePerceptronNer("data/my-hb-ner-model");
         
         
-        String testFile1 = "data/mk_hb_test_set1.txt";
+        String testFile1 = "data/mk_hb_test_set_filtered_2.txt";
+//        cleanTestFile(testFile1);
         
-//        testNerModelZ(myNer,testFile1);
+        testNerModelZ(myNer,testFile1);
         
-        useNer(myNer,sentence3);
+        
+//        splitTestFile(testFile1);
+        
+//        useNer(myNer,sentence3);
         
         
         /*
@@ -168,6 +172,173 @@ public class MainClass {
         
 //        generateTrainingFileFromCsv("data/hb.csv");
 
+    }
+    
+    public static void cleanTestFile(String fileName){
+    
+        File file = new File(fileName);
+        FileReader fr = null;   //reads the file
+        try {
+            fr = new FileReader(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        BufferedReader br = new BufferedReader(fr);  //creates a buffering character input stream
+    
+        FileWriter fwFiltered = null;
+        String testFileFiltered = "data/mk_hb_test_set_filtered_2.txt";
+        try {
+            fwFiltered = new FileWriter(testFileFiltered);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        String line;
+        long lineNumber = 1;
+        while(true){
+            try {
+                line = br.readLine();
+                String lineLower;
+                if ( line == null )
+                    break;
+                else{
+                
+                    boolean isFound = false;
+                    lineLower = line.toLowerCase(trLocale);
+                    
+                    String str1 = "hepsiburada .com";
+                    String str2 = "hepsiburada.com";
+                    String str3 = "hepsiburada";
+                    
+                    for(int i = 0; i < 3; ++i){
+                        String strTemp;
+                        if( i == 0 ){
+                            strTemp = str1;
+                        }
+                        else if( i == 1 ){
+                            strTemp = str2;
+                        }
+                        else{
+                            strTemp = str3;
+                        }
+    
+                        int indexOfString = lineLower.indexOf(strTemp);
+                        if( indexOfString > -1 ){
+                            if( lineNumber % 20 == 18 || lineNumber % 20 == 19 || lineNumber % 20 == 0 ){
+            
+                                fwFiltered.write(line);
+                                fwFiltered.write("\n");
+            
+                                ++lineNumber;
+                                isFound = true;
+                                break;
+                            }
+                            else{
+            
+                                StringBuilder stringBuilder = new StringBuilder();
+                                stringBuilder.append(line.substring(0,indexOfString));
+                                stringBuilder.append(line.substring(indexOfString + strTemp.length()));
+            
+                                fwFiltered.write(stringBuilder.toString());
+                                fwFiltered.write("\n");
+            
+                                ++lineNumber;
+                                isFound = true;
+                                break;
+                            }
+                        }
+                        
+                    }
+                    
+                    if( !isFound ){
+                        
+                        fwFiltered.write(line);
+                        fwFiltered.write("\n");
+    
+                        ++lineNumber;
+                    }
+                    
+                
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+    
+        }
+    
+        try {
+            fwFiltered.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    
+    
+    }
+    
+    public static void splitTestFile(String fileName){
+        
+        
+    
+        File file = new File(fileName);    //creates a new file instance
+        FileReader fr = null;   //reads the file
+        try {
+            fr = new FileReader(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        BufferedReader br = new BufferedReader(fr);  //creates a buffering character input stream
+    
+    
+        FileWriter fwBAD = null;
+        String testFileBAD = "data/mk_hb_test_set_BAD.txt";
+        try {
+            fwBAD = new FileWriter(testFileBAD);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    
+    
+        FileWriter fwBWORD = null;
+        String testFileBWORD = "data/mk_hb_test_set_BWORD.txt";
+        try {
+            fwBWORD = new FileWriter(testFileBWORD);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    
+        String fileBads = "data/badsOrderedByNumOfWords.txt";
+        List<String> badList = readSentencesFromFile(fileBads);
+        
+        String fileBWords = "data/blackListShortOrderedByNumOfWords.txt";
+        List<String> badWordList = readSentencesFromFile(fileBWords);
+    
+        String line;
+        while(true){
+            try {
+                if ( (line = br.readLine()) == null )
+                    break;
+                else{
+                    
+                    String lowerSentence = line.toLowerCase(trLocale);
+    
+                    String[] strArrayLower = lowerSentence.split(" ");
+                    int i = 0;
+                    while(i < strArrayLower.length){
+                    
+                        StringBuilder str = new StringBuilder();
+                        ++i;
+                    }
+                    
+                    
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+    
+        }
+        
+        
+        
     }
     
     public static void testNerModelZ(PerceptronNer myNer, String testFileName) throws IOException {
