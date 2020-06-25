@@ -108,7 +108,7 @@ public class MainClass {
 //
 //        tagSentencesFromFile("data/mk_hb_train_set1.txt");
 //
-//        generateNerModel("data/tagged_hb_training.txt","data/mk_hb_test_set1.txt","data/my-hb-ner-model");
+        generateNerModel("data/tagged_hb_training_suffix.txt","data/mk_hb_test_set_filtered_2.txt","data/my-hb-ner-model-with-suffix");
     
 //        try {
 //            File myObj = new File("data/mk_hb_test_set2.txt");
@@ -134,13 +134,13 @@ public class MainClass {
         
 //        System.out.println("Sentence:" + sentence3);
         
-        PerceptronNer myNer = generatePerceptronNer("data/my-hb-ner-model");
-        
-        
-        String testFile1 = "data/mk_hb_test_set_filtered_2.txt";
-//        cleanTestFile(testFile1);
-        
-        testNerModelZ(myNer,testFile1);
+//        PerceptronNer myNer = generatePerceptronNer("data/my-hb-ner-model");
+//
+//
+//        String testFile1 = "data/mk_hb_test_set_filtered_2.txt";
+////        cleanTestFile(testFile1);
+//
+//        testNerModelZ(myNer,testFile1);
         
         
 //        splitTestFile(testFile1);
@@ -510,30 +510,38 @@ public class MainClass {
     
     
             FileWriter fwTagged = null;
-            String taggedFileName = "data/tagged_hb_training.txt";
+            String taggedFileName = "data/tagged_hb_training_suffix.txt";
             fwTagged = new FileWriter(taggedFileName);
             
             
             FileWriter fw = null;
-            String notTaggedFileName = "data/notTagged_hb_training.txt";
+            String notTaggedFileName = "data/notTagged_hb_training_suffix.txt";
             fw = new FileWriter(notTaggedFileName);
             
         
             String line;
             while((line = br.readLine()) != null)
             {
-                String taggedSent = tagSentence(line);
-                if( taggedSent != null ){
-                    if( line.compareTo(taggedSent) == 0 ){
+                List<String> listTaggedSent = tagSentence(line);
+                if( listTaggedSent != null ){
+                    
+                    for(String taggedSent: listTaggedSent){
         
-                        fw.write(line);
-                        fw.write("\n");
+                        if( taggedSent != null ){
+                            if( line.compareTo(taggedSent) == 0 ){
+                
+                                fw.write(line);
+                                fw.write("\n");
+                
+                            }
+                            else{
+                                fwTagged.write(taggedSent);
+                                fwTagged.write("\n");
+                            }
+                        }
         
                     }
-                    else{
-                        fwTagged.write(taggedSent);
-                        fwTagged.write("\n");
-                    }
+                    
                 }
                 
                 
@@ -552,7 +560,7 @@ public class MainClass {
         
     }
     
-    public static String tagSentence(String sentence){
+    public static List<String> tagSentence(String sentence){
     
         List<String> tokensOfSentenceOrigin = tokenizeSentence(sentence);
         
@@ -574,14 +582,37 @@ public class MainClass {
         
         
         if( tokensOfSentenceOrigin.size() != tokensOfSentence.size() ){
-            System.out.println("something wrong");
-            System.out.println("origin:"+tokensOfSentenceOrigin.toString());
-            System.out.println("lowerr:"+tokensOfSentence.toString());
+//            System.out.println("something wrong");
+//            System.out.println("origin:"+tokensOfSentenceOrigin.toString());
+//            System.out.println("lowerr:"+tokensOfSentence.toString());
             return null;
         }
         else{
+            
+            List<String> listOfTaggedStrings = new ArrayList<>();
     
             StringBuilder sentenceBuilder = new StringBuilder();
+            StringBuilder sentenceBuilder2 = new StringBuilder();
+            StringBuilder sentenceBuilder3 = new StringBuilder();
+            StringBuilder sentenceBuilder4 = new StringBuilder();
+            StringBuilder sentenceBuilder5 = new StringBuilder();
+    
+            List<String> listOfSuffix1ForBad = new ArrayList<>();
+            listOfSuffix1ForBad.add("a");
+            listOfSuffix1ForBad.add("e");
+            List<String> listOfSuffix2ForBad = new ArrayList<>();
+            listOfSuffix2ForBad.add("de");
+            listOfSuffix2ForBad.add("da");
+            listOfSuffix2ForBad.add("te");
+            listOfSuffix2ForBad.add("ta");
+            listOfSuffix2ForBad.add("ye");
+            listOfSuffix2ForBad.add("ya");
+            List<String> listOfSuffix3ForBad = new ArrayList<>();
+            listOfSuffix3ForBad.add("den");
+            listOfSuffix3ForBad.add("dan");
+            listOfSuffix3ForBad.add("ten");
+            listOfSuffix3ForBad.add("tan");
+            
             
             String fileBads = "data/badsOrderedByNumOfWords.txt";    //creates a new file instance
             List<String> badList = readSentencesFromFile(fileBads);
@@ -589,6 +620,8 @@ public class MainClass {
     
             String fileBWords = "data/blackListShortOrderedByNumOfWords.txt";
             List<String> badWordList = readSentencesFromFile(fileBWords);
+            
+            boolean badExistInSentence = false;
     
             int i = 0;
             int sizeTokensOfSentence = tokensOfSentence.size();
@@ -607,7 +640,67 @@ public class MainClass {
                     if( lenString == 1 ){
                         if( tokensOfSentence.get(i).indexOf(strArray[0]) >= 0 ){
                             badCheck = true;
+                            badExistInSentence = true;
                             sentenceBuilder.append("[BAD "+tokensOfSentenceOrigin.get(i)+"] ");
+                            
+                            int lengthOfStr = strArray[0].length();
+                            if( lengthOfStr >= 5 && lengthOfStr < 10 ){
+    
+                                Random rand = new Random();
+    
+                                //  for suffix1
+                                int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                sentenceBuilder2.append("[BAD "+tokensOfSentenceOrigin.get(i)+ listOfSuffix1ForBad.get(randIndex) +"] ");
+                                
+                                int randIndex2 = (randIndex + 1) % listOfSuffix1ForBad.size();
+                                sentenceBuilder3.append("[BAD "+tokensOfSentenceOrigin.get(i)+ listOfSuffix1ForBad.get(randIndex2) +"] ");
+                                
+                                //  for suffix2
+                                int randIndex3 = rand.nextInt(listOfSuffix2ForBad.size());
+                                sentenceBuilder4.append("[BAD "+tokensOfSentenceOrigin.get(i)+ listOfSuffix2ForBad.get(randIndex3) +"] ");
+                                
+                                int randIndex4 = (randIndex3 * 3 + 5) % listOfSuffix2ForBad.size();
+                                sentenceBuilder5.append("[BAD "+tokensOfSentenceOrigin.get(i)+ listOfSuffix2ForBad.get(randIndex4) +"] ");
+                                
+                            }
+                            else if( lengthOfStr >= 10 ){
+    
+                                Random rand = new Random();
+    
+                                //  for suffix1
+                                int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                sentenceBuilder2.append("[BAD "+tokensOfSentenceOrigin.get(i)+ listOfSuffix1ForBad.get(randIndex) +"] ");
+    
+                                //  for suffix2
+                                int randIndex3 = rand.nextInt(listOfSuffix2ForBad.size());
+                                sentenceBuilder4.append("[BAD "+tokensOfSentenceOrigin.get(i)+ listOfSuffix2ForBad.get(randIndex3) +"] ");
+                                
+                                int randIndex4 = (randIndex3 * 3 + 5) % listOfSuffix2ForBad.size();
+                                sentenceBuilder5.append("[BAD "+tokensOfSentenceOrigin.get(i)+ listOfSuffix2ForBad.get(randIndex4) +"] ");
+    
+                                //  for suffix3
+                                int randIndex2 = rand.nextInt(listOfSuffix3ForBad.size());
+                                sentenceBuilder3.append("[BAD "+tokensOfSentenceOrigin.get(i)+ listOfSuffix3ForBad.get(randIndex2) +"] ");
+                                
+                            }
+                            else{ // length < 5
+                                
+                                Random rand = new Random();
+    
+                                //  for suffix1
+                                int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                sentenceBuilder2.append("[BAD "+tokensOfSentenceOrigin.get(i)+ listOfSuffix1ForBad.get(randIndex) +"] ");
+    
+                                int randIndex2 = (randIndex + 1) % listOfSuffix1ForBad.size();
+                                sentenceBuilder3.append("[BAD "+tokensOfSentenceOrigin.get(i)+ listOfSuffix1ForBad.get(randIndex2) +"] ");
+                                
+                                // for origin
+                                sentenceBuilder4.append("[BAD "+tokensOfSentenceOrigin.get(i)+"] ");
+                                sentenceBuilder5.append("[BAD "+tokensOfSentenceOrigin.get(i)+"] ");
+                                
+                            }
+                            
+                            
                             ++i;
                             break;
                         }
@@ -625,10 +718,69 @@ public class MainClass {
                     
                             if( strToken.indexOf(strBad) >= 0 ){
                                 badCheck = true;
+                                badExistInSentence = true;
                                 StringBuilder strBuild3 = new StringBuilder();
                                 strBuild3.append(tokensOfSentenceOrigin.get(i)+" "+tokensOfSentenceOrigin.get(i+1));
                                 String strToken2 = strBuild3.toString();
                                 sentenceBuilder.append("[BAD "+strToken2+"] ");
+    
+                                int lengthOfStr = strBad.length();
+                                if( lengthOfStr >= 5 && lengthOfStr < 10 ){
+        
+                                    Random rand = new Random();
+        
+                                    //  for suffix1
+                                    int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                    sentenceBuilder2.append("[BAD "+ strToken2 + listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                    int randIndex2 = (randIndex + 1) % listOfSuffix1ForBad.size();
+                                    sentenceBuilder3.append("[BAD "+ strToken2 + listOfSuffix1ForBad.get(randIndex2) +"] ");
+        
+                                    //  for suffix2
+                                    int randIndex3 = rand.nextInt(listOfSuffix2ForBad.size());
+                                    sentenceBuilder4.append("[BAD "+ strToken2 + listOfSuffix2ForBad.get(randIndex3) +"] ");
+        
+                                    int randIndex4 = (randIndex3 * 3 + 5) % listOfSuffix2ForBad.size();
+                                    sentenceBuilder5.append("[BAD "+ strToken2 + listOfSuffix2ForBad.get(randIndex4) +"] ");
+        
+                                }
+                                else if( lengthOfStr >= 10 ){
+        
+                                    Random rand = new Random();
+        
+                                    //  for suffix1
+                                    int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                    sentenceBuilder2.append("[BAD "+ strToken2 + listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                    //  for suffix2
+                                    int randIndex3 = rand.nextInt(listOfSuffix2ForBad.size());
+                                    sentenceBuilder4.append("[BAD "+ strToken2 + listOfSuffix2ForBad.get(randIndex3) +"] ");
+        
+                                    int randIndex4 = (randIndex3 * 3 + 5) % listOfSuffix2ForBad.size();
+                                    sentenceBuilder5.append("[BAD "+ strToken2 + listOfSuffix2ForBad.get(randIndex4) +"] ");
+        
+                                    //  for suffix3
+                                    int randIndex2 = rand.nextInt(listOfSuffix3ForBad.size());
+                                    sentenceBuilder3.append("[BAD "+ strToken2 + listOfSuffix3ForBad.get(randIndex2) +"] ");
+        
+                                }
+                                else{ // length < 5
+        
+                                    Random rand = new Random();
+        
+                                    //  for suffix1
+                                    int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                    sentenceBuilder2.append("[BAD "+ strToken2 + listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                    int randIndex2 = (randIndex + 1) % listOfSuffix1ForBad.size();
+                                    sentenceBuilder3.append("[BAD "+ strToken2 + listOfSuffix1ForBad.get(randIndex2) +"] ");
+        
+                                    // for origin
+                                    sentenceBuilder4.append("[BAD "+ strToken2 +"] ");
+                                    sentenceBuilder5.append("[BAD "+ strToken2 +"] ");
+        
+                                }
+                                
                                 i += 2;
                                 break;
                             }
@@ -650,10 +802,69 @@ public class MainClass {
                     
                             if( strToken.indexOf(strBad) >= 0 ){
                                 badCheck = true;
+                                badExistInSentence = true;
                                 StringBuilder strBuild3 = new StringBuilder();
                                 strBuild3.append(tokensOfSentenceOrigin.get(i)+" "+tokensOfSentenceOrigin.get(i+1)+" "+tokensOfSentenceOrigin.get(i+2));
                                 String strToken2 = strBuild3.toString();
                                 sentenceBuilder.append("[BAD "+strToken2+"] ");
+    
+                                int lengthOfStr = strBad.length();
+                                if( lengthOfStr >= 5 && lengthOfStr < 10 ){
+        
+                                    Random rand = new Random();
+        
+                                    //  for suffix1
+                                    int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                    sentenceBuilder2.append("[BAD "+ strToken2 + listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                    int randIndex2 = (randIndex + 1) % listOfSuffix1ForBad.size();
+                                    sentenceBuilder3.append("[BAD "+ strToken2 + listOfSuffix1ForBad.get(randIndex2) +"] ");
+        
+                                    //  for suffix2
+                                    int randIndex3 = rand.nextInt(listOfSuffix2ForBad.size());
+                                    sentenceBuilder4.append("[BAD "+ strToken2 + listOfSuffix2ForBad.get(randIndex3) +"] ");
+        
+                                    int randIndex4 = (randIndex3 * 3 + 5) % listOfSuffix2ForBad.size();
+                                    sentenceBuilder5.append("[BAD "+ strToken2 + listOfSuffix2ForBad.get(randIndex4) +"] ");
+        
+                                }
+                                else if( lengthOfStr >= 10 ){
+        
+                                    Random rand = new Random();
+        
+                                    //  for suffix1
+                                    int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                    sentenceBuilder2.append("[BAD "+ strToken2 + listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                    //  for suffix2
+                                    int randIndex3 = rand.nextInt(listOfSuffix2ForBad.size());
+                                    sentenceBuilder4.append("[BAD "+ strToken2 + listOfSuffix2ForBad.get(randIndex3) +"] ");
+        
+                                    int randIndex4 = (randIndex3 * 3 + 5) % listOfSuffix2ForBad.size();
+                                    sentenceBuilder5.append("[BAD "+ strToken2 + listOfSuffix2ForBad.get(randIndex4) +"] ");
+        
+                                    //  for suffix3
+                                    int randIndex2 = rand.nextInt(listOfSuffix3ForBad.size());
+                                    sentenceBuilder3.append("[BAD "+ strToken2 + listOfSuffix3ForBad.get(randIndex2) +"] ");
+        
+                                }
+                                else{ // length < 5
+        
+                                    Random rand = new Random();
+        
+                                    //  for suffix1
+                                    int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                    sentenceBuilder2.append("[BAD "+ strToken2 + listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                    int randIndex2 = (randIndex + 1) % listOfSuffix1ForBad.size();
+                                    sentenceBuilder3.append("[BAD "+ strToken2 + listOfSuffix1ForBad.get(randIndex2) +"] ");
+        
+                                    // for origin
+                                    sentenceBuilder4.append("[BAD "+ strToken2 +"] ");
+                                    sentenceBuilder5.append("[BAD "+ strToken2 +"] ");
+        
+                                }
+                                
                                 i += 3;
                                 break;
                             }
@@ -675,10 +886,69 @@ public class MainClass {
                     
                             if( strToken.indexOf(strBad) >= 0 ){
                                 badCheck = true;
+                                badExistInSentence = true;
                                 StringBuilder strBuild3 = new StringBuilder();
                                 strBuild3.append(tokensOfSentenceOrigin.get(i)+" "+tokensOfSentenceOrigin.get(i+1)+" "+tokensOfSentenceOrigin.get(i+2)+" "+tokensOfSentenceOrigin.get(i+3));
                                 String strToken2 = strBuild3.toString();
                                 sentenceBuilder.append("[BAD "+strToken2+"] ");
+    
+                                int lengthOfStr = strBad.length();
+                                if( lengthOfStr >= 5 && lengthOfStr < 10 ){
+        
+                                    Random rand = new Random();
+        
+                                    //  for suffix1
+                                    int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                    sentenceBuilder2.append("[BAD "+ strToken2 + listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                    int randIndex2 = (randIndex + 1) % listOfSuffix1ForBad.size();
+                                    sentenceBuilder3.append("[BAD "+ strToken2 + listOfSuffix1ForBad.get(randIndex2) +"] ");
+        
+                                    //  for suffix2
+                                    int randIndex3 = rand.nextInt(listOfSuffix2ForBad.size());
+                                    sentenceBuilder4.append("[BAD "+ strToken2 + listOfSuffix2ForBad.get(randIndex3) +"] ");
+        
+                                    int randIndex4 = (randIndex3 * 3 + 5) % listOfSuffix2ForBad.size();
+                                    sentenceBuilder5.append("[BAD "+ strToken2 + listOfSuffix2ForBad.get(randIndex4) +"] ");
+        
+                                }
+                                else if( lengthOfStr >= 10 ){
+        
+                                    Random rand = new Random();
+        
+                                    //  for suffix1
+                                    int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                    sentenceBuilder2.append("[BAD "+ strToken2 + listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                    //  for suffix2
+                                    int randIndex3 = rand.nextInt(listOfSuffix2ForBad.size());
+                                    sentenceBuilder4.append("[BAD "+ strToken2 + listOfSuffix2ForBad.get(randIndex3) +"] ");
+        
+                                    int randIndex4 = (randIndex3 * 3 + 5) % listOfSuffix2ForBad.size();
+                                    sentenceBuilder5.append("[BAD "+ strToken2 + listOfSuffix2ForBad.get(randIndex4) +"] ");
+        
+                                    //  for suffix3
+                                    int randIndex2 = rand.nextInt(listOfSuffix3ForBad.size());
+                                    sentenceBuilder3.append("[BAD "+ strToken2 + listOfSuffix3ForBad.get(randIndex2) +"] ");
+        
+                                }
+                                else{ // length < 5
+        
+                                    Random rand = new Random();
+        
+                                    //  for suffix1
+                                    int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                    sentenceBuilder2.append("[BAD "+ strToken2 + listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                    int randIndex2 = (randIndex + 1) % listOfSuffix1ForBad.size();
+                                    sentenceBuilder3.append("[BAD "+ strToken2 + listOfSuffix1ForBad.get(randIndex2) +"] ");
+        
+                                    // for origin
+                                    sentenceBuilder4.append("[BAD "+ strToken2 +"] ");
+                                    sentenceBuilder5.append("[BAD "+ strToken2 +"] ");
+        
+                                }
+                                
                                 i += 4;
                                 break;
                             }
@@ -703,7 +973,66 @@ public class MainClass {
                         if( lenString == 1 ){
                             if( tokensOfSentence.get(i).compareTo(strArray[0]) == 0 ){
                                 badWordCheck = true;
+                                badExistInSentence = true;
                                 sentenceBuilder.append("[BWORD "+tokensOfSentenceOrigin.get(i)+"] ");
+    
+                                int lengthOfStr = strArray[0].length();
+                                if( lengthOfStr >= 5 && lengthOfStr < 10 ){
+        
+                                    Random rand = new Random();
+        
+                                    //  for suffix1
+                                    int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                    sentenceBuilder2.append("[BWORD "+tokensOfSentenceOrigin.get(i)+ listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                    int randIndex2 = (randIndex + 1) % listOfSuffix1ForBad.size();
+                                    sentenceBuilder3.append("[BWORD "+tokensOfSentenceOrigin.get(i)+ listOfSuffix1ForBad.get(randIndex2) +"] ");
+        
+                                    //  for suffix2
+                                    int randIndex3 = rand.nextInt(listOfSuffix2ForBad.size());
+                                    sentenceBuilder4.append("[BWORD "+tokensOfSentenceOrigin.get(i)+ listOfSuffix2ForBad.get(randIndex3) +"] ");
+        
+                                    int randIndex4 = (randIndex3 * 3 + 5) % listOfSuffix2ForBad.size();
+                                    sentenceBuilder5.append("[BWORD "+tokensOfSentenceOrigin.get(i)+ listOfSuffix2ForBad.get(randIndex4) +"] ");
+        
+                                }
+                                else if( lengthOfStr >= 10 ){
+        
+                                    Random rand = new Random();
+        
+                                    //  for suffix1
+                                    int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                    sentenceBuilder2.append("[BWORD "+tokensOfSentenceOrigin.get(i)+ listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                    //  for suffix2
+                                    int randIndex3 = rand.nextInt(listOfSuffix2ForBad.size());
+                                    sentenceBuilder4.append("[BWORD "+tokensOfSentenceOrigin.get(i)+ listOfSuffix2ForBad.get(randIndex3) +"] ");
+        
+                                    int randIndex4 = (randIndex3 * 3 + 5) % listOfSuffix2ForBad.size();
+                                    sentenceBuilder5.append("[BWORD "+tokensOfSentenceOrigin.get(i)+ listOfSuffix2ForBad.get(randIndex4) +"] ");
+        
+                                    //  for suffix3
+                                    int randIndex2 = rand.nextInt(listOfSuffix3ForBad.size());
+                                    sentenceBuilder3.append("[BWORD "+tokensOfSentenceOrigin.get(i)+ listOfSuffix3ForBad.get(randIndex2) +"] ");
+        
+                                }
+                                else{ // length < 5
+        
+                                    Random rand = new Random();
+        
+                                    //  for suffix1
+                                    int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                    sentenceBuilder2.append("[BWORD "+tokensOfSentenceOrigin.get(i)+ listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                    int randIndex2 = (randIndex + 1) % listOfSuffix1ForBad.size();
+                                    sentenceBuilder3.append("[BWORD "+tokensOfSentenceOrigin.get(i)+ listOfSuffix1ForBad.get(randIndex2) +"] ");
+        
+                                    // for origin
+                                    sentenceBuilder4.append("[BWORD "+tokensOfSentenceOrigin.get(i)+"] ");
+                                    sentenceBuilder5.append("[BWORD "+tokensOfSentenceOrigin.get(i)+"] ");
+        
+                                }
+                                
                                 ++i;
                                 break;
                             }
@@ -721,10 +1050,69 @@ public class MainClass {
                         
                                 if( strToken.compareTo(strBad) == 0 ){
                                     badWordCheck = true;
+                                    badExistInSentence = true;
                                     StringBuilder strBuild3 = new StringBuilder();
                                     strBuild3.append(tokensOfSentenceOrigin.get(i)+" "+tokensOfSentenceOrigin.get(i+1));
                                     String strToken2 = strBuild3.toString();
-                                    sentenceBuilder.append("[BWORD "+strToken2+"] ");
+                                    sentenceBuilder.append("[BWORD "+ strToken2 +"] ");
+    
+                                    int lengthOfStr = strBad.length();
+                                    if( lengthOfStr >= 5 && lengthOfStr < 10 ){
+        
+                                        Random rand = new Random();
+        
+                                        //  for suffix1
+                                        int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                        sentenceBuilder2.append("[BWORD "+ strToken2 + listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                        int randIndex2 = (randIndex + 1) % listOfSuffix1ForBad.size();
+                                        sentenceBuilder3.append("[BWORD "+ strToken2 + listOfSuffix1ForBad.get(randIndex2) +"] ");
+        
+                                        //  for suffix2
+                                        int randIndex3 = rand.nextInt(listOfSuffix2ForBad.size());
+                                        sentenceBuilder4.append("[BWORD "+ strToken2 + listOfSuffix2ForBad.get(randIndex3) +"] ");
+        
+                                        int randIndex4 = (randIndex3 * 3 + 5) % listOfSuffix2ForBad.size();
+                                        sentenceBuilder5.append("[BWORD "+ strToken2 + listOfSuffix2ForBad.get(randIndex4) +"] ");
+        
+                                    }
+                                    else if( lengthOfStr >= 10 ){
+        
+                                        Random rand = new Random();
+        
+                                        //  for suffix1
+                                        int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                        sentenceBuilder2.append("[BWORD "+ strToken2 + listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                        //  for suffix2
+                                        int randIndex3 = rand.nextInt(listOfSuffix2ForBad.size());
+                                        sentenceBuilder4.append("[BWORD "+ strToken2 + listOfSuffix2ForBad.get(randIndex3) +"] ");
+        
+                                        int randIndex4 = (randIndex3 * 3 + 5) % listOfSuffix2ForBad.size();
+                                        sentenceBuilder5.append("[BWORD "+ strToken2 + listOfSuffix2ForBad.get(randIndex4) +"] ");
+        
+                                        //  for suffix3
+                                        int randIndex2 = rand.nextInt(listOfSuffix3ForBad.size());
+                                        sentenceBuilder3.append("[BWORD "+ strToken2 + listOfSuffix3ForBad.get(randIndex2) +"] ");
+        
+                                    }
+                                    else{ // length < 5
+        
+                                        Random rand = new Random();
+        
+                                        //  for suffix1
+                                        int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                        sentenceBuilder2.append("[BWORD "+ strToken2 + listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                        int randIndex2 = (randIndex + 1) % listOfSuffix1ForBad.size();
+                                        sentenceBuilder3.append("[BWORD "+ strToken2 + listOfSuffix1ForBad.get(randIndex2) +"] ");
+        
+                                        // for origin
+                                        sentenceBuilder4.append("[BWORD "+ strToken2 +"] ");
+                                        sentenceBuilder5.append("[BWORD "+ strToken2 +"] ");
+        
+                                    }
+                                    
                                     i += 2;
                                     break;
                                 }
@@ -746,10 +1134,69 @@ public class MainClass {
                         
                                 if( strToken.compareTo(strBad) == 0 ){
                                     badWordCheck = true;
+                                    badExistInSentence = true;
                                     StringBuilder strBuild3 = new StringBuilder();
                                     strBuild3.append(tokensOfSentenceOrigin.get(i)+" "+tokensOfSentenceOrigin.get(i+1)+" "+tokensOfSentenceOrigin.get(i+2));
                                     String strToken2 = strBuild3.toString();
-                                    sentenceBuilder.append("[BWORD "+strToken2+"] ");
+                                    sentenceBuilder.append("[BWORD "+ strToken2 +"] ");
+    
+                                    int lengthOfStr = strBad.length();
+                                    if( lengthOfStr >= 5 && lengthOfStr < 10 ){
+        
+                                        Random rand = new Random();
+        
+                                        //  for suffix1
+                                        int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                        sentenceBuilder2.append("[BWORD "+ strToken2 + listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                        int randIndex2 = (randIndex + 1) % listOfSuffix1ForBad.size();
+                                        sentenceBuilder3.append("[BWORD "+ strToken2 + listOfSuffix1ForBad.get(randIndex2) +"] ");
+        
+                                        //  for suffix2
+                                        int randIndex3 = rand.nextInt(listOfSuffix2ForBad.size());
+                                        sentenceBuilder4.append("[BWORD "+ strToken2 + listOfSuffix2ForBad.get(randIndex3) +"] ");
+        
+                                        int randIndex4 = (randIndex3 * 3 + 5) % listOfSuffix2ForBad.size();
+                                        sentenceBuilder5.append("[BWORD "+ strToken2 + listOfSuffix2ForBad.get(randIndex4) +"] ");
+        
+                                    }
+                                    else if( lengthOfStr >= 10 ){
+        
+                                        Random rand = new Random();
+        
+                                        //  for suffix1
+                                        int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                        sentenceBuilder2.append("[BWORD "+ strToken2 + listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                        //  for suffix2
+                                        int randIndex3 = rand.nextInt(listOfSuffix2ForBad.size());
+                                        sentenceBuilder4.append("[BWORD "+ strToken2 + listOfSuffix2ForBad.get(randIndex3) +"] ");
+        
+                                        int randIndex4 = (randIndex3 * 3 + 5) % listOfSuffix2ForBad.size();
+                                        sentenceBuilder5.append("[BWORD "+ strToken2 + listOfSuffix2ForBad.get(randIndex4) +"] ");
+        
+                                        //  for suffix3
+                                        int randIndex2 = rand.nextInt(listOfSuffix3ForBad.size());
+                                        sentenceBuilder3.append("[BWORD "+ strToken2 + listOfSuffix3ForBad.get(randIndex2) +"] ");
+        
+                                    }
+                                    else{ // length < 5
+        
+                                        Random rand = new Random();
+        
+                                        //  for suffix1
+                                        int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                        sentenceBuilder2.append("[BWORD "+ strToken2 + listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                        int randIndex2 = (randIndex + 1) % listOfSuffix1ForBad.size();
+                                        sentenceBuilder3.append("[BWORD "+ strToken2 + listOfSuffix1ForBad.get(randIndex2) +"] ");
+        
+                                        // for origin
+                                        sentenceBuilder4.append("[BWORD "+ strToken2 +"] ");
+                                        sentenceBuilder5.append("[BWORD "+ strToken2 +"] ");
+        
+                                    }
+                                    
                                     i += 3;
                                     break;
                                 }
@@ -772,10 +1219,69 @@ public class MainClass {
                         
                                 if( strToken.compareTo(strBad) == 0 ){
                                     badWordCheck = true;
+                                    badExistInSentence = true;
                                     StringBuilder strBuild3 = new StringBuilder();
                                     strBuild3.append(tokensOfSentenceOrigin.get(i)+" "+tokensOfSentenceOrigin.get(i+1)+" "+tokensOfSentenceOrigin.get(i+2)+" "+tokensOfSentenceOrigin.get(i+3));
                                     String strToken2 = strBuild3.toString();
-                                    sentenceBuilder.append("[BWORD "+strToken2+"] ");
+                                    sentenceBuilder.append("[BWORD "+ strToken2 +"] ");
+    
+                                    int lengthOfStr = strBad.length();
+                                    if( lengthOfStr >= 5 && lengthOfStr < 10 ){
+        
+                                        Random rand = new Random();
+        
+                                        //  for suffix1
+                                        int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                        sentenceBuilder2.append("[BWORD "+ strToken2 + listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                        int randIndex2 = (randIndex + 1) % listOfSuffix1ForBad.size();
+                                        sentenceBuilder3.append("[BWORD "+ strToken2 + listOfSuffix1ForBad.get(randIndex2) +"] ");
+        
+                                        //  for suffix2
+                                        int randIndex3 = rand.nextInt(listOfSuffix2ForBad.size());
+                                        sentenceBuilder4.append("[BWORD "+ strToken2 + listOfSuffix2ForBad.get(randIndex3) +"] ");
+        
+                                        int randIndex4 = (randIndex3 * 3 + 5) % listOfSuffix2ForBad.size();
+                                        sentenceBuilder5.append("[BWORD "+ strToken2 + listOfSuffix2ForBad.get(randIndex4) +"] ");
+        
+                                    }
+                                    else if( lengthOfStr >= 10 ){
+        
+                                        Random rand = new Random();
+        
+                                        //  for suffix1
+                                        int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                        sentenceBuilder2.append("[BWORD "+ strToken2 + listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                        //  for suffix2
+                                        int randIndex3 = rand.nextInt(listOfSuffix2ForBad.size());
+                                        sentenceBuilder4.append("[BWORD "+ strToken2 + listOfSuffix2ForBad.get(randIndex3) +"] ");
+        
+                                        int randIndex4 = (randIndex3 * 3 + 5) % listOfSuffix2ForBad.size();
+                                        sentenceBuilder5.append("[BWORD "+ strToken2 + listOfSuffix2ForBad.get(randIndex4) +"] ");
+        
+                                        //  for suffix3
+                                        int randIndex2 = rand.nextInt(listOfSuffix3ForBad.size());
+                                        sentenceBuilder3.append("[BWORD "+ strToken2 + listOfSuffix3ForBad.get(randIndex2) +"] ");
+        
+                                    }
+                                    else{ // length < 5
+        
+                                        Random rand = new Random();
+        
+                                        //  for suffix1
+                                        int randIndex = rand.nextInt(listOfSuffix1ForBad.size());
+                                        sentenceBuilder2.append("[BWORD "+ strToken2 + listOfSuffix1ForBad.get(randIndex) +"] ");
+        
+                                        int randIndex2 = (randIndex + 1) % listOfSuffix1ForBad.size();
+                                        sentenceBuilder3.append("[BWORD "+ strToken2 + listOfSuffix1ForBad.get(randIndex2) +"] ");
+        
+                                        // for origin
+                                        sentenceBuilder4.append("[BWORD "+ strToken2 +"] ");
+                                        sentenceBuilder5.append("[BWORD "+ strToken2 +"] ");
+        
+                                    }
+                                    
                                     i += 4;
                                     break;
                                 }
@@ -791,14 +1297,26 @@ public class MainClass {
         
                 if( !badCheck && !badWordCheck ){
                     sentenceBuilder.append(tokensOfSentenceOrigin.get(i)+" ");
+                    sentenceBuilder2.append(tokensOfSentenceOrigin.get(i)+" ");
+                    sentenceBuilder3.append(tokensOfSentenceOrigin.get(i)+" ");
+                    sentenceBuilder4.append(tokensOfSentenceOrigin.get(i)+" ");
+                    sentenceBuilder5.append(tokensOfSentenceOrigin.get(i)+" ");
                     ++i;
                 }
         
         
             }
     
-    
-            return sentenceBuilder.toString().trim();
+            listOfTaggedStrings.add(sentenceBuilder.toString().trim());
+            if( badExistInSentence ){
+                listOfTaggedStrings.add(sentenceBuilder2.toString().trim());
+                listOfTaggedStrings.add(sentenceBuilder3.toString().trim());
+                listOfTaggedStrings.add(sentenceBuilder4.toString().trim());
+                listOfTaggedStrings.add(sentenceBuilder5.toString().trim());
+            }
+            
+            
+            return listOfTaggedStrings;
         }
         
     }
