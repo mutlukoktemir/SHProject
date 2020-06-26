@@ -117,7 +117,7 @@ public class MainClass {
 //            while (myReader.hasNextLine()) {
 //                String data = myReader.nextLine();
 //                System.out.println("test sentence:\n"+data+"\nResults from ner model:\n");
-//                useNer("data/my-hb-ner-model",data);
+//                findNamedEntities("data/my-hb-ner-model",data);
 //                ++i;
 //                if( i == 63 )
 //                    break;
@@ -128,24 +128,24 @@ public class MainClass {
 //            e.printStackTrace();
 //        }
     
-        String sentence3 = "hüremlak ta gördüğüm ilan için aramıştım.";
-        String sentence4 = "orosbu yapma ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
-        String sentence5 = "piç motor mu araç";
+        String sentence3 = "hepsişurada ta gördüğüm ilan için aramıştım. a.q.";
+        String sentence4 = "orospulu yapma ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
+        String sentence5 = "piços motor mu araç";
         
 //        System.out.println("Sentence:" + sentence3);
         
         PerceptronNer myNer = generatePerceptronNer("data/my-hb-ner-model-with-suffix");
 //
 //
-        String testFile1 = "data/mk_hb_test_set_filtered_2.txt";
-//        cleanTestFile(testFile1);
-
-        testNerModelZ(myNer,testFile1);
+//        String testFile1 = "data/mk_hb_test_set_filtered_2.txt";
+////        cleanTestFile(testFile1);
+//
+//        testNerModelZ(myNer,testFile1);
         
         
 //        splitTestFile(testFile1);
         
-//        useNer(myNer,sentence3);
+        findNamedEntities(myNer,sentence4);
         
         
         /*
@@ -354,7 +354,7 @@ public class MainClass {
         while( listIteratorOfStrings.hasNext() ){
             int index = listIteratorOfStrings.nextIndex() + 1;
         
-            boolean checkFound = useNer(myNer,listIteratorOfStrings.next());
+            boolean checkFound = findNamedEntities(myNer,listIteratorOfStrings.next());
         
             if( index % 20 == 0 || index % 20 == 18 || index % 20 == 19)
             {
@@ -1372,7 +1372,7 @@ public class MainClass {
         return ner;
     }
     
-    public static boolean useNer(PerceptronNer ner, String sentence) throws IOException {
+    public static boolean findNamedEntities(PerceptronNer ner, String sentence) throws IOException {
     
 //        String sentence = "Ali Kaan yarın İstanbul'a gidecek.";
     
