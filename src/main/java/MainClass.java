@@ -108,7 +108,7 @@ public class MainClass {
 //
 //        tagSentencesFromFile("data/mk_hb_train_set1.txt");
 //
-        generateNerModel("data/tagged_hb_training_suffix.txt","data/mk_hb_test_set_filtered_2.txt","data/my-hb-ner-model-with-suffix");
+//        generateNerModel("data/tagged_hb_training_suffix.txt","data/mk_hb_test_set_filtered_2.txt","data/my-hb-ner-model-with-suffix");
     
 //        try {
 //            File myObj = new File("data/mk_hb_test_set2.txt");
@@ -134,13 +134,13 @@ public class MainClass {
         
 //        System.out.println("Sentence:" + sentence3);
         
-//        PerceptronNer myNer = generatePerceptronNer("data/my-hb-ner-model");
+        PerceptronNer myNer = generatePerceptronNer("data/my-hb-ner-model-with-suffix");
 //
 //
-//        String testFile1 = "data/mk_hb_test_set_filtered_2.txt";
-////        cleanTestFile(testFile1);
-//
-//        testNerModelZ(myNer,testFile1);
+        String testFile1 = "data/mk_hb_test_set_filtered_2.txt";
+//        cleanTestFile(testFile1);
+
+        testNerModelZ(myNer,testFile1);
         
         
 //        splitTestFile(testFile1);
