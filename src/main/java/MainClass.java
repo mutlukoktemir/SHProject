@@ -74,31 +74,6 @@ public class MainClass {
         
 //        String sentence3 = "Ürünü yorumlara bakarak aldım iyi https://w ki de almışım :D. Uygun'da fiyat ve yüksek kalitede bir ürün pişman olmazsınız . Tavsiye ederim";
 //
-//        List<String> tokensOfSentenceOrigin = tokenizeSentence(sentence3);
-//
-//        StringBuilder strBuild = new StringBuilder();
-//        for(int i = 0; i < tokensOfSentenceOrigin.size(); ++i){
-//            strBuild.append(tokensOfSentenceOrigin.get(i)+" ");
-//        }
-//
-//        System.out.println("origin:");
-//        String strOrg = strBuild.toString();
-//        System.out.println(strOrg);
-//
-//        String lowerSentence3 = strOrg.toLowerCase(trLocale);
-//
-//        String[] lowerStrArray = lowerSentence3.split(" ");
-//        StringBuilder strBuild2 = new StringBuilder();
-//
-//        for(int i = 0; i < lowerStrArray.length; ++i){
-//            strBuild2.append(lowerStrArray[i]+" ");
-//        }
-//
-//        String strLower = strBuild2.toString().trim();
-//
-//        System.out.println("lower:");
-//        System.out.println(strLower);
-
 
 
 
@@ -110,26 +85,8 @@ public class MainClass {
 //
 //        generateNerModel("data/tagged_hb_training_suffix.txt","data/mk_hb_test_set_filtered_2.txt","data/my-hb-ner-model-with-suffix");
     
-//        try {
-//            File myObj = new File("data/mk_hb_test_set2.txt");
-//            Scanner myReader = new Scanner(myObj);
-//            int i = 0;
-//            while (myReader.hasNextLine()) {
-//                String data = myReader.nextLine();
-//                System.out.println("test sentence:\n"+data+"\nResults from ner model:\n");
-//                findNamedEntities("data/my-hb-ner-model",data);
-//                ++i;
-//                if( i == 63 )
-//                    break;
-//            }
-//            myReader.close();
-//        } catch (FileNotFoundException e) {
-//            System.out.println("An error occurred.");
-//            e.printStackTrace();
-//        }
-    
         String sentence3 = "hepsişurada ta gördüğüm ilan için aramıştım. a.q.";
-        String sentence4 = "orospulu yapma ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
+        String sentence4 = "orospu yapma ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
         String sentence5 = "piços motor mu araç";
         
 //        System.out.println("Sentence:" + sentence3);
@@ -137,8 +94,8 @@ public class MainClass {
         PerceptronNer myNer = generatePerceptronNer("data/my-hb-ner-model-with-suffix");
 //
 //
-//        String testFile1 = "data/mk_hb_test_set_filtered_2.txt";
-////        cleanTestFile(testFile1);
+//        String testFile1 = "data/mk_hb_test_set_2_filtered_2.txt";
+//        cleanTestFile(testFile1);
 //
 //        testNerModelZ(myNer,testFile1);
         
@@ -146,28 +103,7 @@ public class MainClass {
 //        splitTestFile(testFile1);
         
         findNamedEntities(myNer,sentence4);
-        
-        
-        /*
-        List<SingleAnalysis> singleAnalysisList = morphology.analyzeAndDisambiguate(sentence).bestAnalysis();
-        for(int i = 0; i < singleAnalysisList.size(); ++i){
-            System.out.println(singleAnalysisList.get(i));
-        }
-        */
-        
-        /*
-        for (int i = 0; i < tokens.size(); ++i) {
-            WordAnalysis result = morphology.analyze(tokens.get(i));
-            Iterator<SingleAnalysis> iter = result.iterator();
-            while( iter.hasNext() ){
-                SingleAnalysis nextAnalysis = iter.next();
-                System.out.println(nextAnalysis.formatLong());
-//                System.out.println("\tStems = " + analysis.getStems());
-                System.out.println("\tLemmas = " + nextAnalysis.getLemmas());
-            }
-            
-        }
-        */
+
         
         
 //        generateTrainingFileFromCsv("data/hb.csv");
@@ -183,10 +119,17 @@ public class MainClass {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        BufferedReader br = new BufferedReader(fr);  //creates a buffering character input stream
+        BufferedReader br;
+        if( fr != null){
+            br = new BufferedReader(fr);  //creates a buffering character input stream
+        }
+        else{
+            System.err.println("Couldn't open the file:" + fileName);
+            return;
+        }
     
         FileWriter fwFiltered = null;
-        String testFileFiltered = "data/mk_hb_test_set_filtered_2.txt";
+        String testFileFiltered = "data/mk_hb_test_set_2_filtered_2.txt";
         try {
             fwFiltered = new FileWriter(testFileFiltered);
         } catch (IOException e) {
@@ -224,7 +167,8 @@ public class MainClass {
     
                         int indexOfString = lineLower.indexOf(strTemp);
                         if( indexOfString > -1 ){
-                            if( lineNumber % 20 == 18 || lineNumber % 20 == 19 || lineNumber % 20 == 0 ){
+                            // The values below must be changed according to the file
+                            if( lineNumber % 20 == 1 || lineNumber % 20 == 2 || lineNumber % 20 == 3 ){
             
                                 fwFiltered.write(line);
                                 fwFiltered.write("\n");
@@ -356,7 +300,8 @@ public class MainClass {
         
             boolean checkFound = findNamedEntities(myNer,listIteratorOfStrings.next());
         
-            if( index % 20 == 0 || index % 20 == 18 || index % 20 == 19)
+            // The values below must be changed according to the file
+            if( index % 20 == 1 || index % 20 == 2 || index % 20 == 3 )
             {
                 if( checkFound )
                     truePositive++;
@@ -1376,7 +1321,7 @@ public class MainClass {
     
 //        String sentence = "Ali Kaan yarın İstanbul'a gidecek.";
     
-        System.out.println("Sentence:" + sentence);
+//        System.out.println("Sentence:" + sentence);
         
         NerSentence result = ner.findNamedEntities(sentence);
         
