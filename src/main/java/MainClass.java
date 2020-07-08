@@ -117,6 +117,7 @@ public class MainClass {
 
     }
     
+    
     public static void testBadFile(PerceptronNer perceptronNer, String fileName){
         List<String> listOfString = readSentencesFromFile(fileName);
     
@@ -173,6 +174,7 @@ public class MainClass {
         System.out.println("Accuracy: " + accuracy + "\nPrecision: " + precision + "\nRecall: " + recall);
         
     }
+    
     
     public static void testBWordFile(PerceptronNer perceptronNer, String fileName){
         List<String> listOfString = readSentencesFromFile(fileName);
@@ -231,6 +233,7 @@ public class MainClass {
         System.out.println("Accuracy: " + accuracy + "\nPrecision: " + precision + "\nRecall: " + recall);
         
     }
+    
     
     public static List<Integer> hasBadOrBWord(String sentence){
         
@@ -605,6 +608,7 @@ public class MainClass {
     
     }
     
+    
     public static void splitTestFileIntoTwoParts(String fileName){
         
         
@@ -685,6 +689,7 @@ public class MainClass {
         
         
     }
+    
     
     public static void testNerModelZ(PerceptronNer myNer, String testFileName) throws IOException {
     
@@ -841,6 +846,7 @@ public class MainClass {
         
     }
     
+    
     public static void tagSentencesFromFile(String fileName){
     
         try
@@ -900,6 +906,7 @@ public class MainClass {
         
         
     }
+    
     
     public static List<String> tagSentence(String sentence){
     
