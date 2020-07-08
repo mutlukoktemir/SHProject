@@ -102,9 +102,17 @@ public class MainClass {
 //
 //        testNerModelZ(myNer,testFile1);
     
-//        System.out.println("before split test");
-//        splitTestFileIntoTwoParts(testFile1);
-//        System.out.println("after split test");
+        System.out.println("before split test");
+        splitTestFileIntoTwoParts(testFile1);
+        System.out.println("after split test");
+        
+        for(long lineForBad : badSentenceIndexes){
+            System.out.println(lineForBad);
+        }
+        for(long lineForBad : bWordSentenceIndexes){
+            System.out.println(lineForBad);
+        }
+        
         testBadFile(myNer,"data/mk_hb_test_set_BAD.txt");
         testBWordFile(myNer,"data/mk_hb_test_set_BWORD.txt");
         
@@ -134,7 +142,14 @@ public class MainClass {
             boolean checkFound = false;
             try {
                 List<NamedEntity> entities = findNamedEntities(perceptronNer,sentence);
-                
+    
+                // for debugging
+                if( lineNumber == 72 ) {
+                    System.out.println("sentence:" + sentence);
+                    for(NamedEntity entity : entities)
+                        System.out.println("entities:" + entity);
+                }
+    
                 // The values below must be changed according to the file
                 if( badSentenceIndexes.contains(lineNumber) )
                 {
@@ -192,7 +207,7 @@ public class MainClass {
             boolean checkFound = false;
             try {
                 List<NamedEntity> entities = findNamedEntities(perceptronNer,sentence);
-    
+                
                 // The values below must be changed according to the file
                 if( bWordSentenceIndexes.contains(lineNumber) )
                 {
@@ -216,12 +231,7 @@ public class MainClass {
                 e.printStackTrace();
                 break;
             }
-        
-            // for debugging
-//            if( index == 1 )
-//                System.out.println("sentence:" + sentence);
-        
-        
+            
         }
     
         System.out.println("TruePositive: " + truePositive + "\nTrueNegative: " + trueNegative + "\nFalsePositive: " + falsePositive + "\nFalseNegative: " + falseNegative);
@@ -640,7 +650,8 @@ public class MainClass {
             e.printStackTrace();
         }
         
-        long lineNumber = 1;
+        long lineNumberBad = 1;
+        long lineNumberBWord = 1;
         String line;
         while(true){
             try {
@@ -659,24 +670,26 @@ public class MainClass {
                             fwBWORD.write(line);
                             fwBWORD.write("\n");
                             
+                            ++lineNumberBad;
+                            ++lineNumberBWord;
                         }
                         else{
                             for(int badOrBwordNum : listOfHasBadOrBWords ){
                                 if( badOrBwordNum == 1 ){ // bad
-                                    badSentenceIndexes.add(lineNumber);
+                                    badSentenceIndexes.add(lineNumberBad);
+                                    ++lineNumberBad;
                                     fwBAD.write(line);
                                     fwBAD.write("\n");
                                 }
                                 if( badOrBwordNum == 2 ){ // bword
-                                    bWordSentenceIndexes.add(lineNumber);
+                                    bWordSentenceIndexes.add(lineNumberBWord);
+                                    ++lineNumberBWord;
                                     fwBWORD.write(line);
                                     fwBWORD.write("\n");
                                 }
                             }
                         }
                     }
-    
-                    ++lineNumber;
                     
                 }
                 
