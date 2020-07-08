@@ -102,9 +102,9 @@ public class MainClass {
 //
 //        testNerModelZ(myNer,testFile1);
     
-        System.out.println("before split test");
-        splitTestFileIntoTwoParts(testFile1);
-        System.out.println("after split test");
+//        System.out.println("before split test");
+//        splitTestFileIntoTwoParts(testFile1);
+//        System.out.println("after split test");
         testBadFile(myNer,"data/mk_hb_test_set_BAD.txt");
         testBWordFile(myNer,"data/mk_hb_test_set_BWORD.txt");
         
@@ -122,7 +122,7 @@ public class MainClass {
     
         ListIterator<String> listIteratorOfStrings = listOfString.listIterator();
     
-        int truePositive = 0, falsePositive = 0, trueNegative = 0, falseNegative = 0;
+        long truePositive = 0, falsePositive = 0, trueNegative = 0, falseNegative = 0;
         double accuracy = 0.0, precision = 0.0, recall = 0.0;
     
         long lineNumber = 1;
@@ -132,7 +132,27 @@ public class MainClass {
             String sentence = listIteratorOfStrings.next();
             boolean checkFound = false;
             try {
-                checkFound = findNamedEntities(perceptronNer,sentence);
+                List<NamedEntity> entities = findNamedEntities(perceptronNer,sentence);
+                
+                // The values below must be changed according to the file
+                if( badSentenceIndexes.contains(lineNumber) )
+                {
+                    if( !entities.isEmpty() )
+                        truePositive++;
+                    else
+                        falsePositive++;
+        
+                }
+                else
+                {
+                    if( entities.isEmpty() )
+                        trueNegative++;
+                    else
+                        falseNegative++;
+                }
+    
+                ++lineNumber;
+    
             } catch (IOException e) {
                 e.printStackTrace();
                 break;
@@ -142,25 +162,6 @@ public class MainClass {
 //            if( index == 1 )
 //                System.out.println("sentence:" + sentence);
     
-            // The values below must be changed according to the file
-            if( badSentenceIndexes.contains(lineNumber) )
-            {
-                if( checkFound )
-                    truePositive++;
-                else
-                    falsePositive++;
-            
-            }
-            else
-            {
-                if( !checkFound )
-                    trueNegative++;
-                else
-                    falseNegative++;
-            }
-            
-            ++lineNumber;
-        
         }
     
         System.out.println("TruePositive: " + truePositive + "\nTrueNegative: " + trueNegative + "\nFalsePositive: " + falsePositive + "\nFalseNegative: " + falseNegative);
@@ -178,7 +179,7 @@ public class MainClass {
     
         ListIterator<String> listIteratorOfStrings = listOfString.listIterator();
     
-        int truePositive = 0, falsePositive = 0, trueNegative = 0, falseNegative = 0;
+        long truePositive = 0, falsePositive = 0, trueNegative = 0, falseNegative = 0;
         double accuracy = 0.0, precision = 0.0, recall = 0.0;
     
         long lineNumber = 1;
@@ -188,7 +189,27 @@ public class MainClass {
             String sentence = listIteratorOfStrings.next();
             boolean checkFound = false;
             try {
-                checkFound = findNamedEntities(perceptronNer,sentence);
+                List<NamedEntity> entities = findNamedEntities(perceptronNer,sentence);
+    
+                // The values below must be changed according to the file
+                if( bWordSentenceIndexes.contains(lineNumber) )
+                {
+                    if( !entities.isEmpty() )
+                        truePositive++;
+                    else
+                        falsePositive++;
+        
+                }
+                else
+                {
+                    if( entities.isEmpty() )
+                        trueNegative++;
+                    else
+                        falseNegative++;
+                }
+    
+                ++lineNumber;
+                
             } catch (IOException e) {
                 e.printStackTrace();
                 break;
@@ -198,24 +219,6 @@ public class MainClass {
 //            if( index == 1 )
 //                System.out.println("sentence:" + sentence);
         
-            // The values below must be changed according to the file
-            if( bWordSentenceIndexes.contains(lineNumber) )
-            {
-                if( checkFound )
-                    truePositive++;
-                else
-                    falsePositive++;
-            
-            }
-            else
-            {
-                if( !checkFound )
-                    trueNegative++;
-                else
-                    falseNegative++;
-            }
-            
-            ++lineNumber;
         
         }
     
@@ -690,18 +693,18 @@ public class MainClass {
     
         ListIterator<String> listIteratorOfStrings = listOfString.listIterator();
     
-        int truePositive = 0, falsePositive = 0, trueNegative = 0, falseNegative = 0;
+        long truePositive = 0, falsePositive = 0, trueNegative = 0, falseNegative = 0;
         double accuracy = 0.0, precision = 0.0, recall = 0.0;
     
         while( listIteratorOfStrings.hasNext() ){
             int index = listIteratorOfStrings.nextIndex() + 1;
         
-            boolean checkFound = findNamedEntities(myNer,listIteratorOfStrings.next());
+            List<NamedEntity> entities = findNamedEntities(myNer,listIteratorOfStrings.next());
         
             // The values below must be changed according to the file
             if( index % 20 == 1 || index % 20 == 2 || index % 20 == 3 )
             {
-                if( checkFound )
+                if( !entities.isEmpty() )
                     truePositive++;
                 else
                     falsePositive++;
@@ -709,7 +712,7 @@ public class MainClass {
             }
             else
             {
-                if( !checkFound )
+                if( entities.isEmpty() )
                     trueNegative++;
                 else
                     falseNegative++;
@@ -1710,7 +1713,7 @@ public class MainClass {
         return ner;
     }
     
-    public static boolean findNamedEntities(PerceptronNer ner, String sentence) throws IOException {
+    public static List<NamedEntity> findNamedEntities(PerceptronNer ner, String sentence) throws IOException {
     
 //        String sentence = "Ali Kaan yarın İstanbul'a gidecek.";
     
@@ -1724,7 +1727,7 @@ public class MainClass {
 //            System.out.println(namedEntity);
 //        }
         
-        return !namedEntities.isEmpty();
+        return namedEntities;
     }
     
     
@@ -1864,7 +1867,7 @@ public class MainClass {
         try {
             File myObj = new File("data/results.txt");
             Scanner myReader = new Scanner(myObj);
-            int i = 1, truePositive = 0, trueNegative = 0, falsePositive = 0, falseNegative = 0;
+            long i = 1, truePositive = 0, trueNegative = 0, falsePositive = 0, falseNegative = 0;
             double precision = 0.0;
             double recall = 0.0;
             double accuracy = 0.0;
