@@ -38,6 +38,9 @@ public class MainClass {
     private static MyFilteredClassifier classifier;
     
     private static Locale trLocale = new Locale("tr","TR");
+    
+    private static List<Long> badSentenceIndexes = new ArrayList<>();
+    private static List<Long> bWordSentenceIndexes = new ArrayList<>();
 
     /**
      * Main method. With an example usage of this class.
@@ -87,22 +90,26 @@ public class MainClass {
     
         String sentence3 = "hepsişurada ta gördüğüm ilan için aramıştım. a.q.";
         String sentence4 = "orospu a.q ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
-        String sentence5 = "piços motor mu araç";
+        String sentence5 = "piç motor mu araç";
         
 //        System.out.println("Sentence:" + sentence3);
         
         PerceptronNer myNer = generatePerceptronNer("data/my-hb-ner-model-with-suffix");
 //
 //
-//        String testFile1 = "data/mk_hb_test_set_2_filtered_2.txt";
+        String testFile1 = "data/mk_hb_test_set_filtered_2.txt";
 //        cleanTestFile(testFile1);
 //
 //        testNerModelZ(myNer,testFile1);
+    
+        System.out.println("before split test");
+        splitTestFileIntoTwoParts(testFile1);
+        System.out.println("after split test");
+        testBadFile(myNer,"data/mk_hb_test_set_BAD.txt");
+        testBWordFile(myNer,"data/mk_hb_test_set_BWORD.txt");
         
         
-//        splitTestFile(testFile1);
-        
-        findNamedEntities(myNer,sentence4);
+//        findNamedEntities(myNer,sentence4);
 
         
         
@@ -110,9 +117,119 @@ public class MainClass {
 
     }
     
+    public static void testBadFile(PerceptronNer perceptronNer, String fileName){
+        List<String> listOfString = readSentencesFromFile(fileName);
     
+        ListIterator<String> listIteratorOfStrings = listOfString.listIterator();
     
-    public static List<String> splitTestFileIntoTwoParts(String sentence){
+        int truePositive = 0, falsePositive = 0, trueNegative = 0, falseNegative = 0;
+        double accuracy = 0.0, precision = 0.0, recall = 0.0;
+    
+        long lineNumber = 1;
+        while( listIteratorOfStrings.hasNext() ){
+            int index = listIteratorOfStrings.nextIndex() + 1;
+            
+            String sentence = listIteratorOfStrings.next();
+            boolean checkFound = false;
+            try {
+                checkFound = findNamedEntities(perceptronNer,sentence);
+            } catch (IOException e) {
+                e.printStackTrace();
+                break;
+            }
+            
+            // for debugging
+//            if( index == 1 )
+//                System.out.println("sentence:" + sentence);
+    
+            // The values below must be changed according to the file
+            if( badSentenceIndexes.contains(lineNumber) )
+            {
+                if( checkFound )
+                    truePositive++;
+                else
+                    falsePositive++;
+            
+            }
+            else
+            {
+                if( !checkFound )
+                    trueNegative++;
+                else
+                    falseNegative++;
+            }
+            
+            ++lineNumber;
+        
+        }
+    
+        System.out.println("TruePositive: " + truePositive + "\nTrueNegative: " + trueNegative + "\nFalsePositive: " + falsePositive + "\nFalseNegative: " + falseNegative);
+    
+        accuracy = (double)(truePositive + trueNegative) / (double)(truePositive + trueNegative + falseNegative + falsePositive);
+        precision = (double)(truePositive) / (double)(truePositive+falsePositive);
+        recall = (double)(truePositive) / (double)(truePositive+falseNegative);
+    
+        System.out.println("Accuracy: " + accuracy + "\nPrecision: " + precision + "\nRecall: " + recall);
+        
+    }
+    
+    public static void testBWordFile(PerceptronNer perceptronNer, String fileName){
+        List<String> listOfString = readSentencesFromFile(fileName);
+    
+        ListIterator<String> listIteratorOfStrings = listOfString.listIterator();
+    
+        int truePositive = 0, falsePositive = 0, trueNegative = 0, falseNegative = 0;
+        double accuracy = 0.0, precision = 0.0, recall = 0.0;
+    
+        long lineNumber = 1;
+        while( listIteratorOfStrings.hasNext() ){
+            int index = listIteratorOfStrings.nextIndex() + 1;
+        
+            String sentence = listIteratorOfStrings.next();
+            boolean checkFound = false;
+            try {
+                checkFound = findNamedEntities(perceptronNer,sentence);
+            } catch (IOException e) {
+                e.printStackTrace();
+                break;
+            }
+        
+            // for debugging
+//            if( index == 1 )
+//                System.out.println("sentence:" + sentence);
+        
+            // The values below must be changed according to the file
+            if( bWordSentenceIndexes.contains(lineNumber) )
+            {
+                if( checkFound )
+                    truePositive++;
+                else
+                    falsePositive++;
+            
+            }
+            else
+            {
+                if( !checkFound )
+                    trueNegative++;
+                else
+                    falseNegative++;
+            }
+            
+            ++lineNumber;
+        
+        }
+    
+        System.out.println("TruePositive: " + truePositive + "\nTrueNegative: " + trueNegative + "\nFalsePositive: " + falsePositive + "\nFalseNegative: " + falseNegative);
+    
+        accuracy = (double)(truePositive + trueNegative) / (double)(truePositive + trueNegative + falseNegative + falsePositive);
+        precision = (double)(truePositive) / (double)(truePositive+falsePositive);
+        recall = (double)(truePositive) / (double)(truePositive+falseNegative);
+    
+        System.out.println("Accuracy: " + accuracy + "\nPrecision: " + precision + "\nRecall: " + recall);
+        
+    }
+    
+    public static List<Integer> hasBadOrBWord(String sentence){
         
         List<String> tokensOfSentenceOrigin = tokenizeSentence(sentence);
         
@@ -133,6 +250,7 @@ public class MainClass {
         }
         
         
+        
         if( tokensOfSentenceOrigin.size() != tokensOfSentence.size() ){
 //            System.out.println("something wrong");
 //            System.out.println("origin:"+tokensOfSentenceOrigin.toString());
@@ -141,9 +259,8 @@ public class MainClass {
         }
         else{
             
-            List<String> listOfTaggedStrings = new ArrayList<>();
-            
-            StringBuilder sentenceBuilder = new StringBuilder();
+    
+            ArrayList<Integer> listBadOrBWords = new ArrayList<>();
             
             
             String fileBads = "data/badsOrderedByNumOfWords.txt";    //creates a new file instance
@@ -173,8 +290,8 @@ public class MainClass {
                         if( tokensOfSentence.get(i).indexOf(strArray[0]) >= 0 ){
                             badCheck = true;
                             badExistInSentence = true;
-                            sentenceBuilder.append("[BAD "+tokensOfSentenceOrigin.get(i)+"] ");
-                            
+    
+                            listBadOrBWords.add(1);
                             
                             ++i;
                             break;
@@ -194,10 +311,8 @@ public class MainClass {
                             if( strToken.indexOf(strBad) >= 0 ){
                                 badCheck = true;
                                 badExistInSentence = true;
-                                StringBuilder strBuild3 = new StringBuilder();
-                                strBuild3.append(tokensOfSentenceOrigin.get(i)+" "+tokensOfSentenceOrigin.get(i+1));
-                                String strToken2 = strBuild3.toString();
-                                sentenceBuilder.append("[BAD "+strToken2+"] ");
+    
+                                listBadOrBWords.add(1);
                                 
                                 i += 2;
                                 break;
@@ -221,10 +336,8 @@ public class MainClass {
                             if( strToken.indexOf(strBad) >= 0 ){
                                 badCheck = true;
                                 badExistInSentence = true;
-                                StringBuilder strBuild3 = new StringBuilder();
-                                strBuild3.append(tokensOfSentenceOrigin.get(i)+" "+tokensOfSentenceOrigin.get(i+1)+" "+tokensOfSentenceOrigin.get(i+2));
-                                String strToken2 = strBuild3.toString();
-                                sentenceBuilder.append("[BAD "+strToken2+"] ");
+    
+                                listBadOrBWords.add(1);
                                 
                                 i += 3;
                                 break;
@@ -248,10 +361,8 @@ public class MainClass {
                             if( strToken.indexOf(strBad) >= 0 ){
                                 badCheck = true;
                                 badExistInSentence = true;
-                                StringBuilder strBuild3 = new StringBuilder();
-                                strBuild3.append(tokensOfSentenceOrigin.get(i)+" "+tokensOfSentenceOrigin.get(i+1)+" "+tokensOfSentenceOrigin.get(i+2)+" "+tokensOfSentenceOrigin.get(i+3));
-                                String strToken2 = strBuild3.toString();
-                                sentenceBuilder.append("[BAD "+strToken2+"] ");
+    
+                                listBadOrBWords.add(1);
                                 
                                 i += 4;
                                 break;
@@ -278,7 +389,8 @@ public class MainClass {
                             if( tokensOfSentence.get(i).compareTo(strArray[0]) == 0 ){
                                 badWordCheck = true;
                                 badExistInSentence = true;
-                                sentenceBuilder.append("[BWORD "+tokensOfSentenceOrigin.get(i)+"] ");
+    
+                                listBadOrBWords.add(2);
                                 
                                 ++i;
                                 break;
@@ -298,10 +410,8 @@ public class MainClass {
                                 if( strToken.compareTo(strBad) == 0 ){
                                     badWordCheck = true;
                                     badExistInSentence = true;
-                                    StringBuilder strBuild3 = new StringBuilder();
-                                    strBuild3.append(tokensOfSentenceOrigin.get(i)+" "+tokensOfSentenceOrigin.get(i+1));
-                                    String strToken2 = strBuild3.toString();
-                                    sentenceBuilder.append("[BWORD "+ strToken2 +"] ");
+    
+                                    listBadOrBWords.add(2);
                                     
                                     i += 2;
                                     break;
@@ -325,10 +435,8 @@ public class MainClass {
                                 if( strToken.compareTo(strBad) == 0 ){
                                     badWordCheck = true;
                                     badExistInSentence = true;
-                                    StringBuilder strBuild3 = new StringBuilder();
-                                    strBuild3.append(tokensOfSentenceOrigin.get(i)+" "+tokensOfSentenceOrigin.get(i+1)+" "+tokensOfSentenceOrigin.get(i+2));
-                                    String strToken2 = strBuild3.toString();
-                                    sentenceBuilder.append("[BWORD "+ strToken2 +"] ");
+    
+                                    listBadOrBWords.add(2);
                                     
                                     i += 3;
                                     break;
@@ -353,10 +461,8 @@ public class MainClass {
                                 if( strToken.compareTo(strBad) == 0 ){
                                     badWordCheck = true;
                                     badExistInSentence = true;
-                                    StringBuilder strBuild3 = new StringBuilder();
-                                    strBuild3.append(tokensOfSentenceOrigin.get(i)+" "+tokensOfSentenceOrigin.get(i+1)+" "+tokensOfSentenceOrigin.get(i+2)+" "+tokensOfSentenceOrigin.get(i+3));
-                                    String strToken2 = strBuild3.toString();
-                                    sentenceBuilder.append("[BWORD "+ strToken2 +"] ");
+    
+                                    listBadOrBWords.add(2);
                                     
                                     i += 4;
                                     break;
@@ -371,19 +477,17 @@ public class MainClass {
                 }
                 // end of bad word list tagging
                 
+                if( badCheck && badWordCheck )
+                    break;
+    
                 if( !badCheck && !badWordCheck ){
-                    sentenceBuilder.append(tokensOfSentenceOrigin.get(i)+" ");
                     ++i;
                 }
                 
-                
             }
             
-            listOfTaggedStrings.add(sentenceBuilder.toString().trim());
             
-            
-            
-            return listOfTaggedStrings;
+            return listBadOrBWords;
         }
         
     }
@@ -498,7 +602,7 @@ public class MainClass {
     
     }
     
-    public static void splitTestFile(String fileName){
+    public static void splitTestFileIntoTwoParts(String fileName){
         
         
     
@@ -528,13 +632,8 @@ public class MainClass {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    
-        String fileBads = "data/badsOrderedByNumOfWords.txt";
-        List<String> badList = readSentencesFromFile(fileBads);
         
-        String fileBWords = "data/blackListShortOrderedByNumOfWords.txt";
-        List<String> badWordList = readSentencesFromFile(fileBWords);
-    
+        long lineNumber = 1;
         String line;
         while(true){
             try {
@@ -542,18 +641,38 @@ public class MainClass {
                     break;
                 else{
                     
-                    String lowerSentence = line.toLowerCase(trLocale);
+                    List<Integer> listOfHasBadOrBWords = hasBadOrBWord(line);
+                    
+                    if( listOfHasBadOrBWords != null ){
+                        if( listOfHasBadOrBWords.isEmpty() ){
     
-                    String[] strArrayLower = lowerSentence.split(" ");
-                    int i = 0;
-                    while(i < strArrayLower.length){
-                    
-                        StringBuilder str = new StringBuilder();
-                        ++i;
+                            fwBAD.write(line);
+                            fwBAD.write("\n");
+                            
+                            fwBWORD.write(line);
+                            fwBWORD.write("\n");
+                            
+                        }
+                        else{
+                            for(int badOrBwordNum : listOfHasBadOrBWords ){
+                                if( badOrBwordNum == 1 ){ // bad
+                                    badSentenceIndexes.add(lineNumber);
+                                    fwBAD.write(line);
+                                    fwBAD.write("\n");
+                                }
+                                if( badOrBwordNum == 2 ){ // bword
+                                    bWordSentenceIndexes.add(lineNumber);
+                                    fwBWORD.write(line);
+                                    fwBWORD.write("\n");
+                                }
+                            }
+                        }
                     }
-                    
+    
+                    ++lineNumber;
                     
                 }
+                
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -1601,9 +1720,9 @@ public class MainClass {
         
         List<NamedEntity> namedEntities = result.getNamedEntities();
         
-        for (NamedEntity namedEntity : namedEntities) {
-            System.out.println(namedEntity);
-        }
+//        for (NamedEntity namedEntity : namedEntities) {
+//            System.out.println(namedEntity);
+//        }
         
         return !namedEntities.isEmpty();
     }
