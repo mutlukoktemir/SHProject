@@ -64,20 +64,12 @@ public class MainClass {
 //        trial();
 
 
-        Path lookupRoot = Paths.get("data/normalization");
-        Path lmFile = Paths.get("data/lm/lm.2gram.slm");
+//        Path lookupRoot = Paths.get("data/normalization");
+//        Path lmFile = Paths.get("data/lm/lm.2gram.slm");
         
 //        TurkishMorphology morphology = TurkishMorphology.createWithDefaults();
 //        TurkishMorphology morphology = TurkishMorphology.builder().setLexicon(RootLexicon.getDefault()).useInformalAnalysis().build();
 //        TurkishSentenceNormalizer normalizer = new TurkishSentenceNormalizer(morphology, lookupRoot, lmFile);
-
-        String sentence = "Siktir gir a.q. göt ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
-        
-        String sentence2 = "Çok Şazla yoruma gerek yÖk . Çünkü hepsiburada sitesi on line alış veriş konusunda Ilk 5te .";
-        
-//        String sentence3 = "Ürünü yorumlara bakarak aldım iyi https://w ki de almışım :D. Uygun'da fiyat ve yüksek kalitede bir ürün pişman olmazsınız . Tavsiye ederim";
-//
-
 
 
 
@@ -102,6 +94,9 @@ public class MainClass {
 //
 //        testNerModelZ(myNer,testFile1);
     
+        
+        
+        
         System.out.println("before split test");
         splitTestFileIntoTwoParts(testFile1);
         System.out.println("after split test");
@@ -1734,10 +1729,6 @@ public class MainClass {
     }
     
     public static List<NamedEntity> findNamedEntities(PerceptronNer ner, String sentence) throws IOException {
-    
-//        String sentence = "Ali Kaan yarın İstanbul'a gidecek.";
-    
-//        System.out.println("Sentence:" + sentence);
         
         NerSentence result = ner.findNamedEntities(sentence);
         
