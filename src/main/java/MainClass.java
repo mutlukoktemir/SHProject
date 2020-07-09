@@ -77,25 +77,25 @@ public class MainClass {
 //        orderStringsInFileByNumOfWords("data/blackListShort.txt","data/blackListShortOrderedByNumOfWords.txt");
 //        orderStringsInFileByNumOfWords("data/bads.txt","data/badsOrderedByNumOfWords.txt");
 //
-        tagSentencesFromFile("data/mk_hb_train_set2.txt");
-
-        generateNerModel("data/tagged_hb_training_suffix_2.txt","data/mk_hb_test_set_filtered_2.txt","data/my-hb-ner-model-with-suffix-2");
+//        tagSentencesFromFile("data/mk_hb_train_set2.txt");
+//
+//        generateNerModel("data/tagged_hb_training_suffix_2.txt","data/mk_hb_test_set_filtered_2.txt","data/my-hb-ner-model-with-suffix-2");
     
         PerceptronNer myNer = generatePerceptronNer("data/my-hb-ner-model-with-suffix-2");
         
         
-        
-        
-        String sentence3 = "hepsiburadadanlar da gördüğüm ilan için aramıştım. a.q.";
+        String sentence3 = "hepsiburadadanlar oruspu da gördüğüm ilan için aramıştım. a.q.";
         String sentence4 = "orospumusun a.q ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
         String sentence5 = "piç motor mu araç";
         String sentence6 = "https://urun.gittigidiyor.com/cep-telefonu";
+        String sentence7 = "Hocam Merhabalar, ben sattım ama buradan ürünün sıfırını alabilirsiniz https://www.hepsisurda.com/case-4u-tanix-tx6-4k-hdr-tv-box-android-9-4-gb-ram-32-gb-hafiza-p-HBV00000JGIDZ";
+        String sentence8 = "https://www.facebook.com/marketplace/item/496397154264376/ takas düşünür müsün";
         
-//        List<NamedEntity> listOfEntities = findNamedEntities(myNer,sentence6);
-//
-//        System.out.println("Sentence:" + sentence6);
-//        for(NamedEntity entity : listOfEntities)
-//            System.out.println("entity:" + entity);
+        List<NamedEntity> listOfEntities = findNamedEntities(myNer,sentence3);
+
+        System.out.println("Sentence:" + sentence3);
+        for(NamedEntity entity : listOfEntities)
+            System.out.println("entity:" + entity);
     
     
     
@@ -910,7 +910,7 @@ public class MainClass {
                     
                 }
     
-//                System.out.println("lineNumber:" + lineNumber++);
+                System.out.println("lineNumber:" + lineNumber++);
             }
             
             fr.close();
