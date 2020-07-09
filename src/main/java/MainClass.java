@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.spec.RSAOtherPrimeInfo;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -76,43 +77,52 @@ public class MainClass {
 //        orderStringsInFileByNumOfWords("data/blackListShort.txt","data/blackListShortOrderedByNumOfWords.txt");
 //        orderStringsInFileByNumOfWords("data/bads.txt","data/badsOrderedByNumOfWords.txt");
 //
-//        tagSentencesFromFile("data/mk_hb_train_set1.txt");
-//
-//        generateNerModel("data/tagged_hb_training_suffix.txt","data/mk_hb_test_set_filtered_2.txt","data/my-hb-ner-model-with-suffix");
+        tagSentencesFromFile("data/mk_hb_train_set2.txt");
+
+        generateNerModel("data/tagged_hb_training_suffix_2.txt","data/mk_hb_test_set_filtered_2.txt","data/my-hb-ner-model-with-suffix-2");
     
-        String sentence3 = "hepsişurada ta gördüğüm ilan için aramıştım. a.q.";
-        String sentence4 = "orospu a.q ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
+        PerceptronNer myNer = generatePerceptronNer("data/my-hb-ner-model-with-suffix-2");
+        
+        
+        
+        
+        String sentence3 = "hepsiburadadanlar da gördüğüm ilan için aramıştım. a.q.";
+        String sentence4 = "orospumusun a.q ederi 210.000₺ normalde, ben yine sana kıyak olsun diye 275.000₺ dedim";
         String sentence5 = "piç motor mu araç";
+        String sentence6 = "https://urun.gittigidiyor.com/cep-telefonu";
         
-//        System.out.println("Sentence:" + sentence3);
-        
-        PerceptronNer myNer = generatePerceptronNer("data/my-hb-ner-model-with-suffix");
+//        List<NamedEntity> listOfEntities = findNamedEntities(myNer,sentence6);
 //
-//
+//        System.out.println("Sentence:" + sentence6);
+//        for(NamedEntity entity : listOfEntities)
+//            System.out.println("entity:" + entity);
+    
+    
+    
         String testFile1 = "data/mk_hb_test_set_filtered_2.txt";
 //        cleanTestFile(testFile1);
 //
 //        testNerModelZ(myNer,testFile1);
-    
+
+
+
         
         
+//        System.out.println("before split test");
+//        splitTestFileIntoTwoParts(testFile1);
+//        System.out.println("after split test");
+//
+//        for(long lineForBad : badSentenceIndexes){
+//            System.out.println(lineForBad);
+//        }
+//        for(long lineForBad : bWordSentenceIndexes){
+//            System.out.println(lineForBad);
+//        }
+//
+//        testBadFile(myNer,"data/mk_hb_test_set_BAD.txt");
+//        testBWordFile(myNer,"data/mk_hb_test_set_BWORD.txt");
         
-        System.out.println("before split test");
-        splitTestFileIntoTwoParts(testFile1);
-        System.out.println("after split test");
-        
-        for(long lineForBad : badSentenceIndexes){
-            System.out.println(lineForBad);
-        }
-        for(long lineForBad : bWordSentenceIndexes){
-            System.out.println(lineForBad);
-        }
-        
-        testBadFile(myNer,"data/mk_hb_test_set_BAD.txt");
-        testBWordFile(myNer,"data/mk_hb_test_set_BWORD.txt");
-        
-        
-//        findNamedEntities(myNer,sentence4);
+
 
         
         
@@ -139,11 +149,11 @@ public class MainClass {
                 List<NamedEntity> entities = findNamedEntities(perceptronNer,sentence);
     
                 // for debugging
-                if( lineNumber == 72 ) {
-                    System.out.println("sentence:" + sentence);
-                    for(NamedEntity entity : entities)
-                        System.out.println("entities:" + entity);
-                }
+//                if( lineNumber == 72 ) {
+//                    System.out.println("sentence:" + sentence);
+//                    for(NamedEntity entity : entities)
+//                        System.out.println("entities:" + entity);
+//                }
     
                 // The values below must be changed according to the file
                 if( badSentenceIndexes.contains(lineNumber) )
@@ -865,15 +875,16 @@ public class MainClass {
     
     
             FileWriter fwTagged = null;
-            String taggedFileName = "data/tagged_hb_training_suffix.txt";
+            String taggedFileName = "data/tagged_hb_training_suffix_2.txt";
             fwTagged = new FileWriter(taggedFileName);
             
             
             FileWriter fw = null;
-            String notTaggedFileName = "data/notTagged_hb_training_suffix.txt";
+            String notTaggedFileName = "data/notTagged_hb_training_suffix_2.txt";
             fw = new FileWriter(notTaggedFileName);
             
         
+            long lineNumber = 1;
             String line;
             while((line = br.readLine()) != null)
             {
@@ -898,8 +909,8 @@ public class MainClass {
                     }
                     
                 }
-                
-                
+    
+//                System.out.println("lineNumber:" + lineNumber++);
             }
             
             fr.close();
@@ -913,6 +924,195 @@ public class MainClass {
         }
         
         
+    }
+    
+    
+    public static boolean isVowel(char ch){
+        boolean isVow = false;
+        switch (ch) {
+            case 'a':
+            case 'e':
+            case 'ı':
+            case 'i':
+            case 'o':
+            case 'ö':
+            case 'u':
+            case 'ü':
+                isVow = true;
+                break;
+            default:
+                isVow = false;
+        }
+        
+        return isVow;
+    }
+    
+    public static List<String> wordEdittedShorter5(String word){
+        
+        List<String> listOfStrings = new ArrayList<>();
+        List<Character> listOfVowels = Arrays.asList('a', 'e', 'ı','i', 'o', 'ö','u','ü');
+        String consonentsString = "bcçdfgğhjklmnprsştvyz";
+        List<Character> listOfConsonents = consonentsString.chars().mapToObj(c -> (char) c).collect(Collectors.toList());
+        
+        Random random = new Random();
+        
+        int vowelIndexOfWord, consonentIndexOfWord;
+    
+        char wordCharArray[] = word.toCharArray();
+        
+        // remove one vowel
+        while(true){
+            vowelIndexOfWord = random.nextInt(word.length());
+            if( listOfVowels.contains(wordCharArray[vowelIndexOfWord]) ){
+                break;
+            }
+        }
+        String wordWithoutOneVowel = word.substring(0, vowelIndexOfWord) + word.substring(vowelIndexOfWord + 1);
+        listOfStrings.add(wordWithoutOneVowel);
+    
+    
+        // remove one consonent
+//        while(true){
+//            consonentIndexOfWord = random.nextInt(word.length());
+//            if( listOfConsonents.contains(wordCharArray[consonentIndexOfWord]) ){
+//                break;
+//            }
+//        }
+//        String wordWithoutOneConsonent = word.substring(0, consonentIndexOfWord) + word.substring(consonentIndexOfWord + 1);
+//        listOfStrings.add(wordWithoutOneConsonent);
+        
+        
+        return listOfStrings;
+    }
+    
+    
+    public static List<String> wordEditted(String word){
+    
+        List<String> listOfStrings = new ArrayList<>();
+        
+        List<Character> listOfVowels = Arrays.asList('a', 'e', 'ı','i', 'o', 'ö','u','ü');
+        String consonentsString = "bcçdfgğhjklmnprsştvyz";
+        List<Character> listOfConsonents = consonentsString.chars().mapToObj(c -> (char) c).collect(Collectors.toList());
+        
+        Random random = new Random();
+        
+        int vowelIndexOfWord, consonentIndexOfWord;
+        
+        char wordCharArray[] = word.toCharArray();
+        boolean vowelExist = false;
+        boolean consonantExist = false;
+        
+        // remove one vowel
+        for(char ch : wordCharArray){
+            if( listOfVowels.contains(ch) ){
+                vowelExist = true;
+                break;
+            }
+        }
+        if( vowelExist ) {
+            
+            while(true){
+              vowelIndexOfWord = random.nextInt(word.length());
+              if( listOfVowels.contains(wordCharArray[vowelIndexOfWord]) ){
+                  break;
+              }
+            }
+            String wordWithoutOneVowel = word.substring(0, vowelIndexOfWord) + word.substring(vowelIndexOfWord + 1);
+            listOfStrings.add(wordWithoutOneVowel);
+            
+        }
+        
+    
+        // remove one consonent
+        for(char ch : wordCharArray){
+            if( listOfConsonents.contains(ch) ){
+                consonantExist = true;
+                break;
+            }
+        }
+        if( consonantExist ){
+            
+            while(true){
+                consonentIndexOfWord = random.nextInt(word.length());
+                if( listOfConsonents.contains(wordCharArray[consonentIndexOfWord]) ){
+                    break;
+                }
+            }
+            String wordWithoutOneConsonent = word.substring(0, consonentIndexOfWord) + word.substring(consonentIndexOfWord + 1);
+            listOfStrings.add(wordWithoutOneConsonent);
+            
+        }
+        
+        
+    
+        // changing a vowel
+        if( vowelExist ){
+            
+            while(true){
+                vowelIndexOfWord = random.nextInt(word.length());
+                if( listOfVowels.contains(wordCharArray[vowelIndexOfWord]) ){
+                    break;
+                }
+            }
+            int vowel2Index;
+            while(true){
+                vowel2Index = random.nextInt(listOfVowels.size());
+                if( listOfVowels.get(vowel2Index) != wordCharArray[vowelIndexOfWord] ){
+                    break;
+                }
+            }
+            String wordChangedOneVowel = word.substring(0, vowelIndexOfWord) + Character.toString(listOfVowels.get(vowel2Index)) + word.substring(vowelIndexOfWord + 1);
+            listOfStrings.add(wordChangedOneVowel);
+    
+            
+    
+            // changing a vowel with star sign
+            while(true){
+                vowelIndexOfWord = random.nextInt(word.length());
+                if( listOfVowels.contains(wordCharArray[vowelIndexOfWord]) ){
+                    break;
+                }
+            }
+            int vowel3Index;
+            while(true){
+                vowel3Index = random.nextInt(listOfVowels.size());
+                if( listOfVowels.get(vowel3Index) != wordCharArray[vowelIndexOfWord] ){
+                    break;
+                }
+            }
+            String wordChangedStar = word.substring(0, vowelIndexOfWord) + "**" + word.substring(vowelIndexOfWord + 1);
+            listOfStrings.add(wordChangedStar);
+        
+        
+        }
+        
+        
+    
+    
+        // changing a consonent
+        if( consonantExist ){
+            
+            while(true){
+                consonentIndexOfWord = random.nextInt(word.length());
+                if( listOfConsonents.contains(wordCharArray[consonentIndexOfWord]) ){
+                    break;
+                }
+            }
+            int consonent2Index;
+            while(true){
+                consonent2Index = random.nextInt(listOfConsonents.size());
+                if( listOfConsonents.get(consonent2Index) != wordCharArray[consonentIndexOfWord] ){
+                    break;
+                }
+            }
+            String wordChangeOneConsonent = word.substring(0, consonentIndexOfWord) + Character.toString(listOfConsonents.get(consonent2Index)) + word.substring(consonentIndexOfWord + 1);
+            listOfStrings.add(wordChangeOneConsonent);
+        
+        }
+        
+        
+        
+        return listOfStrings;
     }
     
     
@@ -952,6 +1152,11 @@ public class MainClass {
             StringBuilder sentenceBuilder3 = new StringBuilder();
             StringBuilder sentenceBuilder4 = new StringBuilder();
             StringBuilder sentenceBuilder5 = new StringBuilder();
+            StringBuilder sentenceBuilder6 = new StringBuilder();
+            StringBuilder sentenceBuilder7 = new StringBuilder();
+            StringBuilder sentenceBuilder8 = new StringBuilder();
+            StringBuilder sentenceBuilder9 = new StringBuilder();
+            StringBuilder sentenceBuilder10 = new StringBuilder();
     
             List<String> listOfSuffix1ForBad = new ArrayList<>();
             listOfSuffix1ForBad.add("a");
@@ -970,6 +1175,7 @@ public class MainClass {
             listOfSuffix3ForBad.add("tan");
             
             
+            
             String fileBads = "data/badsOrderedByNumOfWords.txt";    //creates a new file instance
             List<String> badList = readSentencesFromFile(fileBads);
     
@@ -978,6 +1184,11 @@ public class MainClass {
             List<String> badWordList = readSentencesFromFile(fileBWords);
             
             boolean badExistInSentence = false;
+            boolean s6check = false;
+            boolean s7check = false;
+            boolean s8check = false;
+            boolean s9check = false;
+            boolean s10check = false;
     
             int i = 0;
             int sizeTokensOfSentence = tokensOfSentence.size();
@@ -1001,6 +1212,37 @@ public class MainClass {
                             
                             int lengthOfStr = strArray[0].length();
                             if( lengthOfStr >= 5 && lengthOfStr < 10 ){
+                                
+                                List<String> listOfStringsEditted = wordEditted(tokensOfSentence.get(i));
+                                
+                                for(int m = 0; m < listOfStringsEditted.size(); ++m){
+                                    if( m == 0 ){ // str1
+                                        sentenceBuilder6.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+                                        
+                                        s6check = true;
+                                    }
+                                    else if( m == 1 ){
+                                        sentenceBuilder7.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+    
+                                        s7check = true;
+                                    }
+                                    else if( m == 2 ){
+                                        sentenceBuilder8.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+    
+                                        s8check = true;
+                                    }
+                                    else if( m == 3 ){
+                                        sentenceBuilder9.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+    
+                                        s9check = true;
+                                    }
+                                    else{
+                                        sentenceBuilder10.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+    
+                                        s10check = true;
+                                    }
+                                }
+                                
     
                                 Random rand = new Random();
     
@@ -1021,6 +1263,36 @@ public class MainClass {
                             }
                             else if( lengthOfStr >= 10 ){
     
+                                List<String> listOfStringsEditted = wordEditted(tokensOfSentence.get(i));
+    
+                                for(int m = 0; m < listOfStringsEditted.size(); ++m){
+                                    if( m == 0 ){ // str1
+                                        sentenceBuilder6.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+            
+                                        s6check = true;
+                                    }
+                                    else if( m == 1 ){
+                                        sentenceBuilder7.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+            
+                                        s7check = true;
+                                    }
+                                    else if( m == 2 ){
+                                        sentenceBuilder8.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+            
+                                        s8check = true;
+                                    }
+                                    else if( m == 3 ){
+                                        sentenceBuilder9.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+    
+                                        s9check = true;
+                                    }
+                                    else{
+                                        sentenceBuilder10.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+    
+                                        s10check = true;
+                                    }
+                                }
+    
                                 Random rand = new Random();
     
                                 //  for suffix1
@@ -1040,6 +1312,36 @@ public class MainClass {
                                 
                             }
                             else{ // length < 5
+    
+//                                List<String> listOfStringsEditted = wordEdittedShorter5(tokensOfSentence.get(i));
+//
+//                                for(int m = 0; m < listOfStringsEditted.size(); ++m){
+//                                    if( m == 0 ){ // str1
+//                                        sentenceBuilder6.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                        s6check = true;
+//                                    }
+//                                    else if( m == 1 ){
+//                                        sentenceBuilder7.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                        s7check = true;
+//                                    }
+//                                    else if( m == 2 ){
+//                                        sentenceBuilder8.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                        s8check = true;
+//                                    }
+//                                    else if( m == 3 ){
+//                                        sentenceBuilder9.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                        s9check = true;
+//                                    }
+//                                    else{
+//                                        sentenceBuilder10.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                        s10check = true;
+//                                    }
+//                                }
                                 
                                 Random rand = new Random();
     
@@ -1082,6 +1384,36 @@ public class MainClass {
     
                                 int lengthOfStr = strBad.length();
                                 if( lengthOfStr >= 5 && lengthOfStr < 10 ){
+    
+//                                    List<String> listOfStringsEditted = wordEditted(strToken);
+//
+//                                    for(int m = 0; m < listOfStringsEditted.size(); ++m){
+//                                        if( m == 0 ){ // str1
+//                                            sentenceBuilder6.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s6check = true;
+//                                        }
+//                                        else if( m == 1 ){
+//                                            sentenceBuilder7.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s7check = true;
+//                                        }
+//                                        else if( m == 2 ){
+//                                            sentenceBuilder8.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s8check = true;
+//                                        }
+//                                        else if( m == 3 ){
+//                                            sentenceBuilder9.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s9check = true;
+//                                        }
+//                                        else{
+//                                            sentenceBuilder10.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s10check = true;
+//                                        }
+//                                    }
         
                                     Random rand = new Random();
         
@@ -1101,6 +1433,36 @@ public class MainClass {
         
                                 }
                                 else if( lengthOfStr >= 10 ){
+    
+                                    List<String> listOfStringsEditted = wordEditted(strToken);
+    
+                                    for(int m = 0; m < listOfStringsEditted.size(); ++m){
+                                        if( m == 0 ){ // str1
+                                            sentenceBuilder6.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+            
+                                            s6check = true;
+                                        }
+                                        else if( m == 1 ){
+                                            sentenceBuilder7.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+            
+                                            s7check = true;
+                                        }
+                                        else if( m == 2 ){
+                                            sentenceBuilder8.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+            
+                                            s8check = true;
+                                        }
+                                        else if( m == 3 ){
+                                            sentenceBuilder9.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+    
+                                            s9check = true;
+                                        }
+                                        else{
+                                            sentenceBuilder10.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+    
+                                            s10check = true;
+                                        }
+                                    }
         
                                     Random rand = new Random();
         
@@ -1121,6 +1483,36 @@ public class MainClass {
         
                                 }
                                 else{ // length < 5
+    
+//                                    List<String> listOfStringsEditted = wordEdittedShorter5(strToken);
+//
+//                                    for(int m = 0; m < listOfStringsEditted.size(); ++m){
+//                                        if( m == 0 ){ // str1
+//                                            sentenceBuilder6.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s6check = true;
+//                                        }
+//                                        else if( m == 1 ){
+//                                            sentenceBuilder7.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s7check = true;
+//                                        }
+//                                        else if( m == 2 ){
+//                                            sentenceBuilder8.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s8check = true;
+//                                        }
+//                                        else if( m == 3 ){
+//                                            sentenceBuilder9.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s9check = true;
+//                                        }
+//                                        else{
+//                                            sentenceBuilder10.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s10check = true;
+//                                        }
+//                                    }
         
                                     Random rand = new Random();
         
@@ -1166,6 +1558,36 @@ public class MainClass {
     
                                 int lengthOfStr = strBad.length();
                                 if( lengthOfStr >= 5 && lengthOfStr < 10 ){
+    
+//                                    List<String> listOfStringsEditted = wordEditted(strToken);
+//
+//                                    for(int m = 0; m < listOfStringsEditted.size(); ++m){
+//                                        if( m == 0 ){ // str1
+//                                            sentenceBuilder6.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s6check = true;
+//                                        }
+//                                        else if( m == 1 ){
+//                                            sentenceBuilder7.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s7check = true;
+//                                        }
+//                                        else if( m == 2 ){
+//                                            sentenceBuilder8.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s8check = true;
+//                                        }
+//                                        else if( m == 3 ){
+//                                            sentenceBuilder9.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s9check = true;
+//                                        }
+//                                        else{
+//                                            sentenceBuilder10.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s10check = true;
+//                                        }
+//                                    }
         
                                     Random rand = new Random();
         
@@ -1185,6 +1607,36 @@ public class MainClass {
         
                                 }
                                 else if( lengthOfStr >= 10 ){
+    
+                                    List<String> listOfStringsEditted = wordEditted(strToken);
+    
+                                    for(int m = 0; m < listOfStringsEditted.size(); ++m){
+                                        if( m == 0 ){ // str1
+                                            sentenceBuilder6.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+            
+                                            s6check = true;
+                                        }
+                                        else if( m == 1 ){
+                                            sentenceBuilder7.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+            
+                                            s7check = true;
+                                        }
+                                        else if( m == 2 ){
+                                            sentenceBuilder8.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+            
+                                            s8check = true;
+                                        }
+                                        else if( m == 3 ){
+                                            sentenceBuilder9.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+    
+                                            s9check = true;
+                                        }
+                                        else{
+                                            sentenceBuilder10.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+    
+                                            s10check = true;
+                                        }
+                                    }
         
                                     Random rand = new Random();
         
@@ -1205,6 +1657,36 @@ public class MainClass {
         
                                 }
                                 else{ // length < 5
+    
+//                                    List<String> listOfStringsEditted = wordEdittedShorter5(strToken);
+//
+//                                    for(int m = 0; m < listOfStringsEditted.size(); ++m){
+//                                        if( m == 0 ){ // str1
+//                                            sentenceBuilder6.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s6check = true;
+//                                        }
+//                                        else if( m == 1 ){
+//                                            sentenceBuilder7.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s7check = true;
+//                                        }
+//                                        else if( m == 2 ){
+//                                            sentenceBuilder8.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s8check = true;
+//                                        }
+//                                        else if( m == 3 ){
+//                                            sentenceBuilder9.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s9check = true;
+//                                        }
+//                                        else{
+//                                            sentenceBuilder10.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s10check = true;
+//                                        }
+//                                    }
         
                                     Random rand = new Random();
         
@@ -1250,6 +1732,36 @@ public class MainClass {
     
                                 int lengthOfStr = strBad.length();
                                 if( lengthOfStr >= 5 && lengthOfStr < 10 ){
+    
+//                                    List<String> listOfStringsEditted = wordEditted(strToken);
+//
+//                                    for(int m = 0; m < listOfStringsEditted.size(); ++m){
+//                                        if( m == 0 ){ // str1
+//                                            sentenceBuilder6.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s6check = true;
+//                                        }
+//                                        else if( m == 1 ){
+//                                            sentenceBuilder7.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s7check = true;
+//                                        }
+//                                        else if( m == 2 ){
+//                                            sentenceBuilder8.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s8check = true;
+//                                        }
+//                                        else if( m == 3 ){
+//                                            sentenceBuilder9.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s9check = true;
+//                                        }
+//                                        else{
+//                                            sentenceBuilder10.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s10check = true;
+//                                        }
+//                                    }
         
                                     Random rand = new Random();
         
@@ -1269,6 +1781,36 @@ public class MainClass {
         
                                 }
                                 else if( lengthOfStr >= 10 ){
+    
+                                    List<String> listOfStringsEditted = wordEditted(strToken);
+    
+                                    for(int m = 0; m < listOfStringsEditted.size(); ++m){
+                                        if( m == 0 ){ // str1
+                                            sentenceBuilder6.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+            
+                                            s6check = true;
+                                        }
+                                        else if( m == 1 ){
+                                            sentenceBuilder7.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+            
+                                            s7check = true;
+                                        }
+                                        else if( m == 2 ){
+                                            sentenceBuilder8.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+            
+                                            s8check = true;
+                                        }
+                                        else if( m == 3 ){
+                                            sentenceBuilder9.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+    
+                                            s9check = true;
+                                        }
+                                        else{
+                                            sentenceBuilder10.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+    
+                                            s10check = true;
+                                        }
+                                    }
         
                                     Random rand = new Random();
         
@@ -1289,6 +1831,36 @@ public class MainClass {
         
                                 }
                                 else{ // length < 5
+    
+//                                    List<String> listOfStringsEditted = wordEdittedShorter5(strToken);
+//
+//                                    for(int m = 0; m < listOfStringsEditted.size(); ++m){
+//                                        if( m == 0 ){ // str1
+//                                            sentenceBuilder6.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s6check = true;
+//                                        }
+//                                        else if( m == 1 ){
+//                                            sentenceBuilder7.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s7check = true;
+//                                        }
+//                                        else if( m == 2 ){
+//                                            sentenceBuilder8.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s8check = true;
+//                                        }
+//                                        else if( m == 3 ){
+//                                            sentenceBuilder9.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s9check = true;
+//                                        }
+//                                        else{
+//                                            sentenceBuilder10.append("[BAD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s10check = true;
+//                                        }
+//                                    }
         
                                     Random rand = new Random();
         
@@ -1334,6 +1906,36 @@ public class MainClass {
     
                                 int lengthOfStr = strArray[0].length();
                                 if( lengthOfStr >= 5 && lengthOfStr < 10 ){
+    
+                                    List<String> listOfStringsEditted = wordEditted(tokensOfSentenceOrigin.get(i));
+    
+                                    for(int m = 0; m < listOfStringsEditted.size(); ++m){
+                                        if( m == 0 ){ // str1
+                                            sentenceBuilder6.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+            
+                                            s6check = true;
+                                        }
+                                        else if( m == 1 ){
+                                            sentenceBuilder7.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+            
+                                            s7check = true;
+                                        }
+                                        else if( m == 2 ){
+                                            sentenceBuilder8.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+            
+                                            s8check = true;
+                                        }
+                                        else if( m == 3 ){
+                                            sentenceBuilder9.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+    
+                                            s9check = true;
+                                        }
+                                        else{
+                                            sentenceBuilder10.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+    
+                                            s10check = true;
+                                        }
+                                    }
         
                                     Random rand = new Random();
         
@@ -1353,6 +1955,36 @@ public class MainClass {
         
                                 }
                                 else if( lengthOfStr >= 10 ){
+    
+                                    List<String> listOfStringsEditted = wordEditted(tokensOfSentenceOrigin.get(i));
+    
+                                    for(int m = 0; m < listOfStringsEditted.size(); ++m){
+                                        if( m == 0 ){ // str1
+                                            sentenceBuilder6.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+            
+                                            s6check = true;
+                                        }
+                                        else if( m == 1 ){
+                                            sentenceBuilder7.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+            
+                                            s7check = true;
+                                        }
+                                        else if( m == 2 ){
+                                            sentenceBuilder8.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+            
+                                            s8check = true;
+                                        }
+                                        else if( m == 3 ){
+                                            sentenceBuilder9.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+    
+                                            s9check = true;
+                                        }
+                                        else{
+                                            sentenceBuilder10.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+    
+                                            s10check = true;
+                                        }
+                                    }
         
                                     Random rand = new Random();
         
@@ -1373,6 +2005,36 @@ public class MainClass {
         
                                 }
                                 else{ // length < 5
+    
+//                                    List<String> listOfStringsEditted = wordEdittedShorter5(tokensOfSentenceOrigin.get(i));
+//
+//                                    for(int m = 0; m < listOfStringsEditted.size(); ++m){
+//                                        if( m == 0 ){ // str1
+//                                            sentenceBuilder6.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s6check = true;
+//                                        }
+//                                        else if( m == 1 ){
+//                                            sentenceBuilder7.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s7check = true;
+//                                        }
+//                                        else if( m == 2 ){
+//                                            sentenceBuilder8.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s8check = true;
+//                                        }
+//                                        else if( m == 3 ){
+//                                            sentenceBuilder9.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s9check = true;
+//                                        }
+//                                        else{
+//                                            sentenceBuilder10.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                            s10check = true;
+//                                        }
+//                                    }
         
                                     Random rand = new Random();
         
@@ -1414,6 +2076,36 @@ public class MainClass {
     
                                     int lengthOfStr = strBad.length();
                                     if( lengthOfStr >= 5 && lengthOfStr < 10 ){
+    
+//                                        List<String> listOfStringsEditted = wordEditted(strToken);
+//
+//                                        for(int m = 0; m < listOfStringsEditted.size(); ++m){
+//                                            if( m == 0 ){ // str1
+//                                                sentenceBuilder6.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s6check = true;
+//                                            }
+//                                            else if( m == 1 ){
+//                                                sentenceBuilder7.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s7check = true;
+//                                            }
+//                                            else if( m == 2 ){
+//                                                sentenceBuilder8.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s8check = true;
+//                                            }
+//                                            else if( m == 3 ){
+//                                                sentenceBuilder9.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s9check = true;
+//                                            }
+//                                            else{
+//                                                sentenceBuilder10.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s10check = true;
+//                                            }
+//                                        }
         
                                         Random rand = new Random();
         
@@ -1433,6 +2125,36 @@ public class MainClass {
         
                                     }
                                     else if( lengthOfStr >= 10 ){
+    
+                                        List<String> listOfStringsEditted = wordEditted(strToken);
+    
+                                        for(int m = 0; m < listOfStringsEditted.size(); ++m){
+                                            if( m == 0 ){ // str1
+                                                sentenceBuilder6.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+            
+                                                s6check = true;
+                                            }
+                                            else if( m == 1 ){
+                                                sentenceBuilder7.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+            
+                                                s7check = true;
+                                            }
+                                            else if( m == 2 ){
+                                                sentenceBuilder8.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+            
+                                                s8check = true;
+                                            }
+                                            else if( m == 3 ){
+                                                sentenceBuilder9.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+    
+                                                s9check = true;
+                                            }
+                                            else{
+                                                sentenceBuilder10.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+    
+                                                s10check = true;
+                                            }
+                                        }
         
                                         Random rand = new Random();
         
@@ -1453,6 +2175,36 @@ public class MainClass {
         
                                     }
                                     else{ // length < 5
+    
+//                                        List<String> listOfStringsEditted = wordEdittedShorter5(strToken);
+//
+//                                        for(int m = 0; m < listOfStringsEditted.size(); ++m){
+//                                            if( m == 0 ){ // str1
+//                                                sentenceBuilder6.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s6check = true;
+//                                            }
+//                                            else if( m == 1 ){
+//                                                sentenceBuilder7.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s7check = true;
+//                                            }
+//                                            else if( m == 2 ){
+//                                                sentenceBuilder8.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s8check = true;
+//                                            }
+//                                            else if( m == 3 ){
+//                                                sentenceBuilder9.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s9check = true;
+//                                            }
+//                                            else{
+//                                                sentenceBuilder10.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s10check = true;
+//                                            }
+//                                        }
         
                                         Random rand = new Random();
         
@@ -1498,6 +2250,36 @@ public class MainClass {
     
                                     int lengthOfStr = strBad.length();
                                     if( lengthOfStr >= 5 && lengthOfStr < 10 ){
+    
+//                                        List<String> listOfStringsEditted = wordEditted(strToken);
+//
+//                                        for(int m = 0; m < listOfStringsEditted.size(); ++m){
+//                                            if( m == 0 ){ // str1
+//                                                sentenceBuilder6.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s6check = true;
+//                                            }
+//                                            else if( m == 1 ){
+//                                                sentenceBuilder7.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s7check = true;
+//                                            }
+//                                            else if( m == 2 ){
+//                                                sentenceBuilder8.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s8check = true;
+//                                            }
+//                                            else if( m == 3 ){
+//                                                sentenceBuilder9.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s9check = true;
+//                                            }
+//                                            else{
+//                                                sentenceBuilder10.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s10check = true;
+//                                            }
+//                                        }
         
                                         Random rand = new Random();
         
@@ -1517,6 +2299,36 @@ public class MainClass {
         
                                     }
                                     else if( lengthOfStr >= 10 ){
+    
+                                        List<String> listOfStringsEditted = wordEditted(strToken);
+    
+                                        for(int m = 0; m < listOfStringsEditted.size(); ++m){
+                                            if( m == 0 ){ // str1
+                                                sentenceBuilder6.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+            
+                                                s6check = true;
+                                            }
+                                            else if( m == 1 ){
+                                                sentenceBuilder7.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+            
+                                                s7check = true;
+                                            }
+                                            else if( m == 2 ){
+                                                sentenceBuilder8.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+            
+                                                s8check = true;
+                                            }
+                                            else if( m == 3 ){
+                                                sentenceBuilder9.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+    
+                                                s9check = true;
+                                            }
+                                            else{
+                                                sentenceBuilder10.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+    
+                                                s10check = true;
+                                            }
+                                        }
         
                                         Random rand = new Random();
         
@@ -1537,6 +2349,36 @@ public class MainClass {
         
                                     }
                                     else{ // length < 5
+    
+//                                        List<String> listOfStringsEditted = wordEdittedShorter5(strToken);
+//
+//                                        for(int m = 0; m < listOfStringsEditted.size(); ++m){
+//                                            if( m == 0 ){ // str1
+//                                                sentenceBuilder6.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s6check = true;
+//                                            }
+//                                            else if( m == 1 ){
+//                                                sentenceBuilder7.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s7check = true;
+//                                            }
+//                                            else if( m == 2 ){
+//                                                sentenceBuilder8.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s8check = true;
+//                                            }
+//                                            else if( m == 3 ){
+//                                                sentenceBuilder9.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s9check = true;
+//                                            }
+//                                            else{
+//                                                sentenceBuilder10.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s10check = true;
+//                                            }
+//                                        }
         
                                         Random rand = new Random();
         
@@ -1583,6 +2425,36 @@ public class MainClass {
     
                                     int lengthOfStr = strBad.length();
                                     if( lengthOfStr >= 5 && lengthOfStr < 10 ){
+    
+//                                        List<String> listOfStringsEditted = wordEditted(strToken);
+//
+//                                        for(int m = 0; m < listOfStringsEditted.size(); ++m){
+//                                            if( m == 0 ){ // str1
+//                                                sentenceBuilder6.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s6check = true;
+//                                            }
+//                                            else if( m == 1 ){
+//                                                sentenceBuilder7.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s7check = true;
+//                                            }
+//                                            else if( m == 2 ){
+//                                                sentenceBuilder8.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s8check = true;
+//                                            }
+//                                            else if( m == 3 ){
+//                                                sentenceBuilder9.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s9check = true;
+//                                            }
+//                                            else{
+//                                                sentenceBuilder10.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s10check = true;
+//                                            }
+//                                        }
         
                                         Random rand = new Random();
         
@@ -1602,6 +2474,36 @@ public class MainClass {
         
                                     }
                                     else if( lengthOfStr >= 10 ){
+    
+                                        List<String> listOfStringsEditted = wordEditted(strToken);
+    
+                                        for(int m = 0; m < listOfStringsEditted.size(); ++m){
+                                            if( m == 0 ){ // str1
+                                                sentenceBuilder6.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+            
+                                                s6check = true;
+                                            }
+                                            else if( m == 1 ){
+                                                sentenceBuilder7.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+            
+                                                s7check = true;
+                                            }
+                                            else if( m == 2 ){
+                                                sentenceBuilder8.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+            
+                                                s8check = true;
+                                            }
+                                            else if( m == 3 ){
+                                                sentenceBuilder9.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+    
+                                                s9check = true;
+                                            }
+                                            else{
+                                                sentenceBuilder10.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+    
+                                                s10check = true;
+                                            }
+                                        }
         
                                         Random rand = new Random();
         
@@ -1622,6 +2524,36 @@ public class MainClass {
         
                                     }
                                     else{ // length < 5
+    
+//                                        List<String> listOfStringsEditted = wordEdittedShorter5(strToken);
+//
+//                                        for(int m = 0; m < listOfStringsEditted.size(); ++m){
+//                                            if( m == 0 ){ // str1
+//                                                sentenceBuilder6.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s6check = true;
+//                                            }
+//                                            else if( m == 1 ){
+//                                                sentenceBuilder7.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s7check = true;
+//                                            }
+//                                            else if( m == 2 ){
+//                                                sentenceBuilder8.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s8check = true;
+//                                            }
+//                                            else if( m == 3 ){
+//                                                sentenceBuilder9.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s9check = true;
+//                                            }
+//                                            else{
+//                                                sentenceBuilder10.append("[BWORD " + listOfStringsEditted.get(m) + "] ");
+//
+//                                                s10check = true;
+//                                            }
+//                                        }
         
                                         Random rand = new Random();
         
@@ -1657,6 +2589,13 @@ public class MainClass {
                     sentenceBuilder3.append(tokensOfSentenceOrigin.get(i)+" ");
                     sentenceBuilder4.append(tokensOfSentenceOrigin.get(i)+" ");
                     sentenceBuilder5.append(tokensOfSentenceOrigin.get(i)+" ");
+                    
+                    sentenceBuilder6.append(tokensOfSentenceOrigin.get(i)+" ");
+                    sentenceBuilder7.append(tokensOfSentenceOrigin.get(i)+" ");
+                    sentenceBuilder8.append(tokensOfSentenceOrigin.get(i)+" ");
+                    sentenceBuilder9.append(tokensOfSentenceOrigin.get(i)+" ");
+                    sentenceBuilder10.append(tokensOfSentenceOrigin.get(i)+" ");
+                    
                     ++i;
                 }
         
@@ -1669,6 +2608,18 @@ public class MainClass {
                 listOfTaggedStrings.add(sentenceBuilder3.toString().trim());
                 listOfTaggedStrings.add(sentenceBuilder4.toString().trim());
                 listOfTaggedStrings.add(sentenceBuilder5.toString().trim());
+    
+                if( s6check )
+                    listOfTaggedStrings.add(sentenceBuilder6.toString().trim());
+                if( s7check )
+                    listOfTaggedStrings.add(sentenceBuilder7.toString().trim());
+                if( s8check )
+                    listOfTaggedStrings.add(sentenceBuilder8.toString().trim());
+                if( s9check )
+                    listOfTaggedStrings.add(sentenceBuilder9.toString().trim());
+                if( s10check )
+                    listOfTaggedStrings.add(sentenceBuilder10.toString().trim());
+                
             }
             
             
